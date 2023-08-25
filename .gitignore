@@ -1,0 +1,16 @@
+#ignore migration folder
+migrations
+
+#ignore .env files
+.env
+
+#ignore .venv folder
+.venv
+
+#ignore picture files
+.jpg
+
+.png
+
+#ignore __pycache__
+__pycache__
