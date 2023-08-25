@@ -1,4 +1,4 @@
-from administrator_app.serializers import IndividualInstructorSerializer
+from administrator.serializers import IndividualInstructorSerializer
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework import permissions, response, status, viewsets
 from Users.permissions import IsInstructor
