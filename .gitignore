@@ -1,6 +1,3 @@
-#ignore migration folder
-migrations
-
 #ignore .env files
 .env
 
