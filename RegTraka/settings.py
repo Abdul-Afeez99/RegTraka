@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'corsheaders',
     'Users',
     'drf_yasg',
     'administrator',
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -75,6 +77,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'RegTraka.wsgi.application'
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+]
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
