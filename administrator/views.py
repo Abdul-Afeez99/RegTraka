@@ -54,6 +54,10 @@ class CourseCreateAPIView(CreateAPIView):
     queryset = Courses.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
+    @swagger_auto_schema(
+        operation_summary = "Create a new course",
+        operation_description= "Create a new course and add it to the list of available courses."
+    )
     def perform_create(self, serializer):
         school = getAdministratorObject(self)
         return serializer.save(school=school)
