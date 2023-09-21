@@ -11,3 +11,9 @@
 
 #ignore __pycache__
 __pycache__
+
+#ignore db
+db.sqlite3
+
+#ignore migrations
+*_initial.py

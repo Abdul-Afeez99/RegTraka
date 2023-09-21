@@ -1,6 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import (AbstractUser, BaseUserManager,
-                                        AbstractBaseUser, PermissionsMixin)
+from django.contrib.auth.models import (AbstractUser, BaseUserManager,)
+import os
+from django.utils.deconstruct import deconstructible
 
 # Create your models here.
 # Custom user manager to manage our users
@@ -115,6 +116,21 @@ class Courses(models.Model):
     school = models.ForeignKey(Administrator, on_delete=models.CASCADE, related_name='school_courses') 
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, related_name="instructor_courses")
 
+#Handles students pictures and stores it with their matric number
+@deconstructible
+class PathAndRename(object):
+
+    def __init__(self, sub_path):
+        self.path = sub_path
+
+    def __call__(self, instance, filename):
+        extension = filename.split('.')[-1]
+        # set filename as random string
+        filename = '{}.{}'.format(instance.matric_no, extension)
+        # return the whole path to the file
+        return os.path.join(self.path, filename)
+
+path_and_rename = PathAndRename("images/")
        
 # Student model
 class Student(models.Model):
@@ -127,6 +143,6 @@ class Student(models.Model):
     matric_no = models.CharField(max_length=30, null=True, blank=True)
     year = models.ForeignKey(Year, on_delete=models.CASCADE, related_name="student_in_class")
     gender = models.CharField(choices=sex, max_length=20, null=True)
-    image = models.ImageField(upload_to= 'images/')
+    image = models.ImageField(upload_to= path_and_rename, null=True, blank=True, default="images/default.png")
     courses = models.ManyToManyField(Courses, related_name='student_courses')
     

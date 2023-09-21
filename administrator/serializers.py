@@ -6,7 +6,7 @@ from rest_framework import serializers
 class CreateCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Courses
-        fields = ['title', 'year', 'instructor_name', 'credit']
+        fields = ['title', 'year', 'instructor', 'credit']
         extra_kwargs = {
             'title': {'required': True},
             'credit': {'required': True},
@@ -16,9 +16,9 @@ class CreateCourseSerializer(serializers.ModelSerializer):
     def save(self, **kwargs):
         school_object = Administrator.objects.get(user=self.context["request"].user)
         year= self.validated_data['year']
-        instructor_name = self.validated_data['instructor_name']
+        instructor = self.validated_data['instructor']
         year_object = Year.objects.get(name=year, school=school_object)
-        instructor_object = Instructor.objects.get(name=instructor_name, school=school_object)
+        instructor_object = Instructor.objects.get(name=instructor, school=school_object)
         Courses.objects.create(
             title=self.validated_data['title'],
             year=year_object,
