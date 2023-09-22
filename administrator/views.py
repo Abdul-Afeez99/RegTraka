@@ -86,6 +86,22 @@ class CourseListAPIView(ListAPIView):
             result.append(output)
         return response.Response(result, status=status.HTTP_200_OK)
     
+#Get total number of courses in a school
+class TotalCoursesInSchoolAPIView(ListAPIView):
+    serializer_class = CourseSerializer
+    queryset = Courses.objects.all()
+    permission_classes = [IsAdministrator&permissions.IsAuthenticated]
+    
+    @swagger_auto_schema(
+        operation_summary = "Get total number of courses in school",
+        operation_description= "Returns total number of courses in the school"
+    )
+    def get(self, request, *args, **kwargs):
+        school = getAdministratorObject(self)
+        total_courses = self.queryset.filter(school=school).count()
+        result = {"Total_Course": total_courses}
+        return response.Response(result)
+    
 # Modify an individual course 
 class CourseDetailAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = CourseSerializer
@@ -134,6 +150,22 @@ class InsructorListAPIView(ListAPIView):
             output['name'] = instructor.name
             output['gender'] = instructor.gender
             result.append(output)
+        return response.Response(result)
+    
+#Get total number of instructors in a school
+class TotalInstructorsInSchoolAPIView(ListAPIView):
+    serializer_class = InstructorSerializer
+    queryset = Instructor.objects.all()
+    permission_classes = [IsAdministrator&permissions.IsAuthenticated]
+    
+    @swagger_auto_schema(
+        operation_summary = "Get total number of instructors in school",
+        operation_description= "Returns total number of instructors in the school"
+    )
+    def get(self, request, *args, **kwargs):
+        school = getAdministratorObject(self)
+        total_instructors = self.queryset.filter(school=school).count()
+        result = {"Total_Instructors": total_instructors}
         return response.Response(result)
 
 # Modify individual Instructor
@@ -207,6 +239,54 @@ class StudentListAPIView(RetrieveAPIView):
         school = getAdministratorObject(self)
         return self.queryset.filter(school=school)
     
+#Get total number of students in a school
+class TotalStudentInSchoolAPIView(ListAPIView):
+    serializer_class = StudentSerializer
+    queryset = Student.objects.all()
+    permission_classes = [IsAdministrator&permissions.IsAuthenticated]
+    
+    @swagger_auto_schema(
+        operation_summary = "Get total number of students in school",
+        operation_description= "Returns total number of students in the school"
+    )
+    def get(self, request, *args, **kwargs):
+        school = getAdministratorObject(self)
+        total_students = self.queryset.filter(school=school).count()
+        result = {"Total_Student": total_students}
+        return response.Response(result)
+    
+# Get total male students in a school
+class TotalMaleStudentInSchoolAPIView(ListAPIView):
+    serializer_class = StudentSerializer
+    queryset = Student.objects.all()
+    permission_classes = [IsAdministrator&permissions.IsAuthenticated]
+    
+    @swagger_auto_schema(
+        operation_summary = "Get total number of male students in school",
+        operation_description= "Returns total number of male students in the school"
+    )
+    def get(self, request, *args, **kwargs):
+        school = getAdministratorObject(self)
+        total_students = self.queryset.filter(school=school, gender='Male').count()
+        result = {"Total_male_student": total_students}
+        return response.Response(result)
+   
+# Get total female students in a school
+class TotalFemaleStudentInSchoolAPIView(ListAPIView):
+    serializer_class = StudentSerializer
+    queryset = Student.objects.all()
+    permission_classes = [IsAdministrator&permissions.IsAuthenticated]
+    
+    @swagger_auto_schema(
+        operation_summary = "Get total number of female students in school",
+        operation_description= "Returns total number of female students in the school"
+    )
+    def get(self, request, *args, **kwargs):
+        school = getAdministratorObject(self)
+        total_students = self.queryset.filter(school=school, gender='Female').count()
+        result = {"Total_female_student": total_students}
+        return response.Response(result)
+        
 # Modify student information
 class StudentAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = StudentSerializer
