@@ -2,11 +2,12 @@ from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDe
 from .serializers import (CourseSerializer, InstructorSerializer, ClassroomSerializer, StudentSerializer, CreateCourseSerializer,
                           ListAllStudentInClassSerializer, IndividualInstructorSerializer, CreateClassroomSerializer)
 from Users.models import Courses, Administrator, Instructor, Year, Student
-from rest_framework import permissions, response, status
+from rest_framework import permissions, response, status, serializers
 from Users.permissions import IsAdministrator
 from Users.serializers import UserSerializer
 from Users.serializers import InstructorRegistrationSerializer
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema, OpenApiExample
+
 
 # Create your views here.
 
@@ -17,7 +18,7 @@ def getAdministratorObject(self,):
     return school
 
 
-# Get the current instructor information
+# Get the current administrator information
 class AdministratorInfoView(RetrieveAPIView):
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     serializer_class = UserSerializer
@@ -36,10 +37,6 @@ class InstructorRegistrationView(GenericAPIView):
     serializer_class = InstructorRegistrationSerializer
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
-    @swagger_auto_schema(
-        operation_summary = "Instructor registration",
-        operation_description= "Returns the instructor information"
-    )
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -54,10 +51,6 @@ class CourseCreateAPIView(CreateAPIView):
     queryset = Courses.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
-    @swagger_auto_schema(
-        operation_summary = "Create a new course",
-        operation_description= "Create a new course and add it to the list of available courses."
-    )
     def perform_create(self, serializer):
         school = getAdministratorObject(self)
         return serializer.save(school=school)
@@ -68,9 +61,16 @@ class CourseListAPIView(ListAPIView):
     queryset = Courses.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
-    @swagger_auto_schema(
-        operation_summary = "List courses in school",
-        operation_description= "Returns list of courses in school"
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Example of courses in the school.",
+                value={"title": 'Hydraulics', "credit": 4, 
+                       "instructor": "AbdulAfeez", "class":"100level"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
     )
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
@@ -92,10 +92,17 @@ class TotalCoursesInSchoolAPIView(ListAPIView):
     queryset = Courses.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
-    @swagger_auto_schema(
-        operation_summary = "Get total number of courses in school",
-        operation_description= "Returns total number of courses in the school"
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Example of total number of courses in school.",
+                value={"Total_Course": 10},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
     )
+    
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
         total_courses = self.queryset.filter(school=school).count()
@@ -113,10 +120,6 @@ class CourseDetailAPIView(RetrieveUpdateDestroyAPIView):
         school = getAdministratorObject(self)
         return serializer.save(school=school)
     
-    @swagger_auto_schema(
-        operation_summary = "Get a particular course",
-        operation_description= "Returns course details"
-    )
     def get(self, request, title):
         course = self.queryset.filter(school=getAdministratorObject(self), title=title)
         result = []
@@ -137,10 +140,6 @@ class InsructorListAPIView(ListAPIView):
     queryset = Instructor.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
-    @swagger_auto_schema(
-        operation_summary = "List instructors in school",
-        operation_description= "Returns list of instructors in school"
-    )
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
         instructors = self.queryset.filter(school=school)
@@ -158,10 +157,17 @@ class TotalInstructorsInSchoolAPIView(ListAPIView):
     queryset = Instructor.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
-    @swagger_auto_schema(
-        operation_summary = "Get total number of instructors in school",
-        operation_description= "Returns total number of instructors in the school"
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Example of total number of instructors in school.",
+                value={"Total_Instructors": 30},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
     )
+    
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
         total_instructors = self.queryset.filter(school=school).count()
@@ -175,10 +181,6 @@ class InsructorModifyAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     lookup_field = "name"
     
-    @swagger_auto_schema(
-        operation_summary = "Get a particular instructor in school",
-        operation_description= "Returns instructor detail"
-    )
     def get(self, request, name):
         school = getAdministratorObject(self)
         instructors = self.queryset.filter(school=school, name=name)
@@ -208,10 +210,6 @@ class ClassroomListAPIView(ListAPIView):
     queryset = Year.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
-    @swagger_auto_schema(
-        operation_summary = "List all classrooms in school",
-        operation_description= "Returns list of classrooms in school"
-    )
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
         classrooms = self.queryset.filter(school=school)
@@ -230,11 +228,6 @@ class StudentListAPIView(RetrieveAPIView):
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     lookup_field = "year"
     
-    
-    @swagger_auto_schema(
-        operation_summary = "List all students in a class",
-        operation_description= "Returns list of students in class"
-    )
     def get_queryset(self):
         school = getAdministratorObject(self)
         return self.queryset.filter(school=school)
@@ -244,10 +237,15 @@ class TotalStudentInSchoolAPIView(ListAPIView):
     serializer_class = StudentSerializer
     queryset = Student.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
-    
-    @swagger_auto_schema(
-        operation_summary = "Get total number of students in school",
-        operation_description= "Returns total number of students in the school"
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Example of total number of students in school.",
+                value={"Total_Student": 10},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
     )
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
@@ -261,9 +259,15 @@ class TotalMaleStudentInSchoolAPIView(ListAPIView):
     queryset = Student.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
-    @swagger_auto_schema(
-        operation_summary = "Get total number of male students in school",
-        operation_description= "Returns total number of male students in the school"
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Example of total number of male students in school.",
+                value={"Total_male_student": 10},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
     )
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
@@ -277,9 +281,15 @@ class TotalFemaleStudentInSchoolAPIView(ListAPIView):
     queryset = Student.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
-    @swagger_auto_schema(
-        operation_summary = "Get total number of female students in school",
-        operation_description= "Returns total number of female students in the school"
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Example of total number of female students in school.",
+                value={"Total_female_student": 10},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
     )
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
@@ -298,10 +308,6 @@ class StudentAPIView(RetrieveUpdateDestroyAPIView):
         school = getAdministratorObject(self)
         return serializer.save(school=school)
     
-    @swagger_auto_schema(
-        operation_summary = "Get a student information",
-        operation_description= "Returns student information"
-    )
     def get_queryset(self):
         school = getAdministratorObject(self)
         return list(self.queryset.filter(school=school).values())   

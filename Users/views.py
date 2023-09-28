@@ -3,17 +3,12 @@ from rest_framework import generics, permissions, response, status, viewsets
 from .serializers import (AdministratorRegistrationSerializer, InstructorRegistrationSerializer,
                           LoginSerializer, StudentRegistrationSerializer)
 from .models import CustomUser, Administrator, Instructor, Student
-from drf_yasg.utils import swagger_auto_schema
 
 #Admin user registration view
 class AdministratorRegistrationView(generics.GenericAPIView):
     serializer_class = AdministratorRegistrationSerializer
     permission_classes = [permissions.AllowAny]
     
-    @swagger_auto_schema(
-        operation_summary = "School Admin registration",
-        operation_description= "Returns the school information"
-    )
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -28,10 +23,6 @@ class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = [permissions.AllowAny]
     
-    @swagger_auto_schema(
-        operation_summary = "User login",
-        operation_description= "Returns the user information",
-    )
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         valid = serializer.is_valid(raise_exception=True)

@@ -3,6 +3,7 @@ from django.contrib.auth.models import (AbstractUser, BaseUserManager,)
 import os
 from django.utils.deconstruct import deconstructible
 
+
 # Create your models here.
 # Custom user manager to manage our users
 class CustomUserManager(BaseUserManager):
@@ -146,3 +147,9 @@ class Student(models.Model):
     image = models.ImageField(upload_to= path_and_rename, null=True, blank=True, default="images/default.png")
     courses = models.ManyToManyField(Courses, related_name='student_courses')
     
+# Attendance model
+class Attendance(models.Model):
+    date = models.DateField(auto_now=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='student_attendance')
+    course = models.ForeignKey(Courses, on_delete=models.CASCADE, related_name='course_attendance')
+    is_present = models.BooleanField(null=True)

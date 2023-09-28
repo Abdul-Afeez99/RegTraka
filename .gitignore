@@ -17,3 +17,6 @@ db.sqlite3
 
 #ignore migrations
 *_initial.py
+
+#ignore images 
+images

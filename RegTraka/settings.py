@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'drf_spectacular',
     'Users',
-    'drf_yasg',
     'administrator',
     'instructor'
 ]
@@ -118,7 +118,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
 
 
 AUTH_USER_MODEL = "Users.CustomUser"
@@ -140,6 +142,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+STATIC_ROOT = BASE_DIR/'static'
 STATIC_URL = 'static/'
 
 # Default primary key field type
@@ -150,14 +153,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = BASE_DIR/'media'
 MEDIA_URL = '/media/'
 
-SWAGGER_SETTINGS = {
-   'SECURITY_DEFINITIONS': {
-      'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-      }
-   }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'RegTraka API',
+    'DESCRIPTION': 'API documentation RegTraka',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True
 }
 
 SIMPLE_JWT = {

@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import GetInstructorCoursesAPIView, InstructorInfoView, ViewCourseStudentsAPIView
+from .views import (GetInstructorCoursesAPIView, InstructorInfoView,
+                    ViewCourseStudentsAPIView,)
 
 
 urlpatterns = [
