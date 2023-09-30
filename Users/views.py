@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions, response, status, viewsets
-from .serializers import (AdministratorRegistrationSerializer, InstructorRegistrationSerializer,
+from .serializers import (AdministratorRegistrationSerializer, AdministratorSerializer,
                           LoginSerializer, StudentRegistrationSerializer)
 from .models import CustomUser, Administrator, Instructor, Student
 
@@ -17,6 +17,13 @@ class AdministratorRegistrationView(generics.GenericAPIView):
         return response.Response(
             user_data, status=status.HTTP_201_CREATED
         )
+
+#Get all schools view
+class GetAllSchoolsView(generics.ListAPIView):
+    serializer_class = AdministratorSerializer
+    permission_classes = [permissions.AllowAny]
+    queryset = Administrator.objects.all()
+        
 
 #Login View for users    
 class LoginView(generics.GenericAPIView):

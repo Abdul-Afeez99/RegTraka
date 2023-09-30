@@ -46,9 +46,14 @@ class AdministratorRegistrationSerializer(serializers.ModelSerializer):
             name = self.validated_data['name']
         )
         
+#serializer for administrator
+class AdministratorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Administrator
+        fields = ['name']
         
-#Serializer for instructor registration
 
+#Serializer for instructor registration
 class InstructorRegistrationSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=200)
     password = serializers.CharField(max_length=68, min_length=12, write_only=True)
