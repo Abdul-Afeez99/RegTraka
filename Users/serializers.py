@@ -51,7 +51,12 @@ class AdministratorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Administrator
         fields = ['name']
-        
+
+class ClassroomSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Year
+        fields = ['name']        
 
 #Serializer for instructor registration
 class InstructorRegistrationSerializer(serializers.ModelSerializer):
