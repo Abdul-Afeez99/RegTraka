@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions, response, status, viewsets
 from .serializers import (AdministratorRegistrationSerializer, AdministratorSerializer,
-                          LoginSerializer, StudentRegistrationSerializer, ClassroomSerializer)
+                          LoginSerializer, StudentRegistrationSerializer, ClassSerializer)
 from .models import CustomUser, Administrator, Instructor, Year
 
 #Admin user registration view
@@ -26,7 +26,7 @@ class GetAllSchoolsView(generics.ListAPIView):
         
 #Get the available classes in a school view
 class ClassroomListAPIView(generics.RetrieveAPIView):
-    serializer_class = ClassroomSerializer
+    serializer_class = ClassSerializer
     queryset = Year.objects.all()
     permission_classes = [permissions.AllowAny]
     lookup_field = 'school'

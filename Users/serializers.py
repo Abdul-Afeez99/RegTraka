@@ -52,8 +52,7 @@ class AdministratorSerializer(serializers.ModelSerializer):
         model = Administrator
         fields = ['name']
 
-class ClassroomSerializer(serializers.ModelSerializer):
-    
+class ClassSerializer(serializers.ModelSerializer):    
     class Meta:
         model = Year
         fields = ['name']        
