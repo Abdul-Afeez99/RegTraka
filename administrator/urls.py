@@ -3,7 +3,8 @@ from .views import (CourseListAPIView, CourseDetailAPIView, InsructorListAPIView
                     CourseCreateAPIView,InsructorModifyAPIView, ClassroomCreateAPIView,
                     ClassroomListAPIView, StudentListAPIView, StudentAPIView, InstructorRegistrationView,
                     TotalStudentInSchoolAPIView,TotalMaleStudentInSchoolAPIView, TotalFemaleStudentInSchoolAPIView,
-                    TotalCoursesInSchoolAPIView, TotalInstructorsInSchoolAPIView
+                    TotalCoursesInSchoolAPIView, TotalInstructorsInSchoolAPIView, GetCourseAttendanceView, GetCourseAttendanceByDateView,
+                    CountTotalAttendanceView
                     )
 
 urlpatterns = [
@@ -21,5 +22,8 @@ urlpatterns = [
     path('total_male_student', TotalMaleStudentInSchoolAPIView.as_view(), name="Total_male_student"),
     path('total_female_student', TotalFemaleStudentInSchoolAPIView.as_view(), name="Total_female_student"),
     path('total_course', TotalCoursesInSchoolAPIView.as_view(), name="Total_courses"),
-    path('total_instructors', TotalInstructorsInSchoolAPIView.as_view(), name="Total_instructors"),   
+    path('total_instructors', TotalInstructorsInSchoolAPIView.as_view(), name="Total_instructors"), 
+    path("attendance/<str:course>", GetCourseAttendanceView.as_view(), name="course_attendance"),
+    path("attendance/", GetCourseAttendanceByDateView.as_view(), name="course_attendance_by_date"),
+    path("total_attendance", CountTotalAttendanceView.as_view(), name='total_attendance')  
 ]

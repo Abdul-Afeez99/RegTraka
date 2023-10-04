@@ -1,13 +1,13 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView, GenericAPIView
 from .serializers import (CourseSerializer, InstructorSerializer, ClassroomSerializer, StudentSerializer, CreateCourseSerializer,
                           ListAllStudentInClassSerializer, IndividualInstructorSerializer, CreateClassroomSerializer)
-from Users.models import Courses, Administrator, Instructor, Year, Student
+from Users.models import Courses, Administrator, Instructor, Year, Student, Attendance
 from rest_framework import permissions, response, status, serializers
 from Users.permissions import IsAdministrator
 from Users.serializers import UserSerializer
 from Users.serializers import InstructorRegistrationSerializer
-from drf_spectacular.utils import extend_schema, OpenApiExample
-
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
+from instructor.serializers import AttendanceSerializer
 
 # Create your views here.
 
@@ -312,3 +312,89 @@ class StudentAPIView(RetrieveUpdateDestroyAPIView):
         school = getAdministratorObject(self)
         return list(self.queryset.filter(school=school).values())   
          
+# Get the course attendance view
+class GetCourseAttendanceView(ListAPIView):
+    serializer_class = AttendanceSerializer
+    permission_classes = [IsAdministrator&permissions.IsAuthenticated]
+    queryset = Attendance.objects.all()
+    lookup_field = "course"
+    
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Example of attendace",
+                value={"date": '22/1/2023', "name": "AbdulAfeez", 
+                       "matric_no": "20171469"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+        description= "Gets the list of a course attendance"
+    )
+    def get(self, request, course):
+        course = Courses.objects.filter(title=course) 
+        course_attendance = self.queryset.filter(course=course).order_by('-date')
+        result = []
+        for attendance in course_attendance:
+            student_atendance = {}
+            student_atendance['date'] = attendance.date
+            student_atendance['name'] = attendance.student.name
+            student_atendance['matric_no'] = attendance.student.matric_no
+            result.append(student_atendance)
+        return response.Response(result)
+    
+# View to get the course attendance using the date     
+class GetCourseAttendanceByDateView(RetrieveAPIView):
+    serializer_class = AttendanceSerializer
+    permission_classes = [IsAdministrator&permissions.IsAuthenticated]
+    queryset = Attendance.objects.all()
+    filterset_fields = ['course', 'date']
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='course', description='Filter by course title', required=True, type=str),
+            OpenApiParameter(name='date', description='Filter by date attendance was taken', required=True, type=str)
+        ],
+        examples=[
+            OpenApiExample(
+                "Example of attendace",
+                value={"date": '22/1/2023', "name": "AbdulAfeez", 
+                       "matric_no": "20171469"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+        description="Get the course attendance for a particular day"
+    )
+    def get(self, request, *args, **kwargs):
+        course_title = self.kwargs['course']  # Extract course title from URL
+        date = self.kwargs['date']
+        course = Courses.objects.filter(title=course_title).first()
+        course_attendance = self.queryset.filter(course=course, date=date)
+        result = []
+        for attendance in course_attendance:
+            student_atendance = {}
+            student_atendance['date'] = attendance.date
+            student_atendance['name'] = attendance.student.name
+            student_atendance['matric_no'] = attendance.student.matric_no
+            result.append(student_atendance)
+        return response.Response(result)
+    
+#Get total attendance count    
+class CountTotalAttendanceView(ListAPIView):
+    serializer_class = AttendanceSerializer
+    permission_classes = [IsAdministrator&permissions.IsAuthenticated]
+    queryset = Attendance.objects.all()
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Example of total attendace",
+                value={"total_attendance": 23},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+        description="Get the total attendance count"
+    )
+    def get(self, request):
+        total_course_attendance = self.queryset.values('date').distinct().count()
+        return response.Response({'total_attendance':total_course_attendance})

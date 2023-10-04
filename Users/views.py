@@ -2,7 +2,9 @@ from django.shortcuts import render
 from rest_framework import generics, permissions, response, status, viewsets
 from .serializers import (AdministratorRegistrationSerializer, AdministratorSerializer,
                           LoginSerializer, StudentRegistrationSerializer, ClassSerializer)
-from .models import CustomUser, Administrator, Instructor, Year
+from administrator.serializers import CourseSerializer
+from .models import CustomUser, Administrator, Instructor, Year, Courses
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 
 #Admin user registration view
 class AdministratorRegistrationView(generics.GenericAPIView):
@@ -41,8 +43,31 @@ class ClassroomListAPIView(generics.RetrieveAPIView):
             result.append(output)
         return response.Response(result)
     
-
+# View to get all the courses in the class 
+class ListAllCoursesAPIView(generics.RetrieveAPIView):
+    serializer_class = CourseSerializer
+    queryset = Courses.objects.all()
+    permission_classes = [permissions.AllowAny]
+    filter_fields = ('school', 'classroom',)
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='school', description='Filter by school name', required=True, type=str),
+            OpenApiParameter(name='classroom', description='Filter by classroom', required=True, type=str)
+        ],
+    )
     
+    def get(self, request, *args, **kwargs):
+        school = self.kwargs['school']  # Extract course title from URL
+        classroom = self.kwargs['classroom']
+        school_object = Administrator.objects.filter(name=school)
+        classroom_object = Year.objects.filter(name=classroom)
+        all_courses = self.queryset.filter(school=school_object, year=classroom_object)
+        available_courses = {}
+        result = []
+        for course in all_courses:
+            result.append(course.title)
+        available_courses['courses'] = result
+        return response.Response(available_courses)
 
 #Login View for users    
 class LoginView(generics.GenericAPIView):

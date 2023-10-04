@@ -142,6 +142,7 @@ class ViewCourseStudentsAPIView(RetrieveAPIView):
 # Start attendance API View
 class StartAttendanceView(APIView):
     permission_classes = [IsInstructor&permissions.IsAuthenticated]
+    serializer_class = None
     @extend_schema(
         parameters=[
             OpenApiParameter(name='title', description='Filter by course title', required=True, type=str)
@@ -182,7 +183,7 @@ class StopAttendanceView(APIView):
             return response.Response({"message": "No active attendance process to stop."}, status=status.HTTP_400_BAD_REQUEST)
           
 # Get the course attendance view
-class GetCourseAttendanceView(RetrieveAPIView):
+class GetCourseAttendanceView(ListAPIView):
     serializer_class = AttendanceSerializer
     permission_classes = [IsInstructor&permissions.IsAuthenticated]
     queryset = Attendance.objects.all()
@@ -198,6 +199,7 @@ class GetCourseAttendanceView(RetrieveAPIView):
                 response_only=True,
             ),
         ],
+        description="Get a particular course atttendance"
     )
     def get(self, request, course):
         course = Courses.objects.filter(title=course) 
@@ -216,7 +218,7 @@ class GetCourseAttendanceByDateView(RetrieveAPIView):
     serializer_class = AttendanceSerializer
     permission_classes = [IsInstructor&permissions.IsAuthenticated]
     queryset = Attendance.objects.all()
-    filter_fields = ('course', 'date',)
+    filterset_fields = ['course', 'date']
     @extend_schema(
         parameters=[
             OpenApiParameter(name='course', description='Filter by course title', required=True, type=str),
@@ -231,8 +233,9 @@ class GetCourseAttendanceByDateView(RetrieveAPIView):
                 response_only=True,
             ),
         ],
+        description= "Get the list of course attendance for a particular day"
     )
-    def get_queryset(self):
+    def get(self, request, *args, **kwargs):
         course_title = self.kwargs['course']  # Extract course title from URL
         date = self.kwargs['date']
         course = Courses.objects.filter(title=course_title).first()
@@ -245,3 +248,16 @@ class GetCourseAttendanceByDateView(RetrieveAPIView):
             student_atendance['matric_no'] = attendance.student.matric_no
             result.append(student_atendance)
         return response.Response(result)
+    
+#Get total attendance count    
+class CountTotalAttendanceView(ListAPIView):
+    serializer_class = AttendanceSerializer
+    permission_classes = [IsInstructor&permissions.IsAuthenticated]
+    queryset = Attendance.objects.all()
+    lookup_field = 'course'
+    
+    def get(self, request, course):
+        course_obj = Courses.objects.filter(title=course)
+        total_course_attendance = self.queryset.filter(course=course_obj).values('date').distinct().count()
+        return response.Response({'total_attendance':total_course_attendance})
+        
