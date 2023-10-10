@@ -1,7 +1,7 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView, GenericAPIView
 from .serializers import (CourseSerializer, InstructorSerializer, ClassroomSerializer, StudentSerializer, CreateCourseSerializer,
                           ListAllStudentInClassSerializer, IndividualInstructorSerializer, CreateClassroomSerializer)
-from Users.models import Courses, Administrator, Instructor, Year, Student, Attendance
+from Users.models import Courses, Administrator, Instructor, Year, Student, Attendance, CustomUser
 from rest_framework import permissions, response, status, serializers
 from Users.permissions import IsAdministrator
 from Users.serializers import UserSerializer
@@ -141,12 +141,23 @@ class InsructorListAPIView(ListAPIView):
     queryset = Instructor.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "List all instructors in the school.",
+                value={'email': "example@email.com", 'name': "instructor name", 'gender': "MALE"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+    )
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
         instructors = self.queryset.filter(school=school)
         result = []
         for instructor in instructors:
             output = {}
+            output['email'] = instructor.user.email
             output['name'] = instructor.name
             output['gender'] = instructor.gender
             result.append(output)
