@@ -36,10 +36,11 @@ class AdministratorInfoView(RetrieveAPIView):
 class InstructorRegistrationView(GenericAPIView):
     serializer_class = InstructorRegistrationSerializer
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
-    
+       
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save()
         user_data = serializer.data
         return response.Response(
             user_data, status=status.HTTP_201_CREATED
