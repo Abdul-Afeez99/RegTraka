@@ -1,6 +1,6 @@
 # Regtraka Frontend
 
-a user interface for the regtraka attendance system built by a Abdualafeez.
+a user interface for the regtraka attendance system built by Abdulafeez.[[link to UI](https://www.figma.com/file/3JUSJ5UYTRXOJ0U7aFTS9q/RegTraka?node-id=0%3A1&mode=dev)]
 
 ## Running the app
 
