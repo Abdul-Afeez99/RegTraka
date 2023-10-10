@@ -10,6 +10,7 @@ type User = {
 export interface UserSlice {
   user?: User;
   setUser: (user: User) => void;
+  deleteUser: () => void;
 }
 
 const createUserSlice: StateCreator<UserSlice> = (set) => ({
@@ -17,6 +18,10 @@ const createUserSlice: StateCreator<UserSlice> = (set) => ({
     set(() => ({
       user: user,
     })),
+  deleteUser: () =>
+    set({
+      user: undefined,
+    }),
 });
 // thanks copilot :)
 export default createUserSlice;

@@ -1,12 +1,36 @@
-import { createMutation } from "react-query-kit";
-import { login, signup, registerStudents } from "..";
+import { createMutation, createQuery } from "react-query-kit";
+import {
+  login,
+  signup,
+  registerStudents,
+  getAdminCourses,
+  getAdminTotalStudents,
+  getAdminInstructors,
+  addInstructor,
+} from "..";
 
 export const useSignup = createMutation({
-	mutationFn: signup,
+  mutationFn: signup,
 });
 export const useLogin = createMutation({
-	mutationFn: login,
+  mutationFn: login,
 });
 export const useRegisterStudent = createMutation({
-	mutationFn: registerStudents,
+  mutationFn: registerStudents,
+});
+export const useAdminCourses = createQuery({
+  primaryKey: "adminCourses",
+  queryFn: getAdminCourses,
+});
+export const useAdminTotalStudents = createQuery({
+  primaryKey: "adminTotalStudents",
+  queryFn: getAdminTotalStudents,
+});
+export const useAdminInstructors = createQuery({
+  primaryKey: "adminInstructors",
+  queryFn: getAdminInstructors,
+});
+
+export const useAddInstructors = createMutation({
+  mutationFn: addInstructor,
 });
