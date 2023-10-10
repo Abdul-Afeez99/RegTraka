@@ -1,10 +1,19 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions, response, status, viewsets
 from .serializers import (AdministratorRegistrationSerializer, AdministratorSerializer,
-                          LoginSerializer, StudentRegistrationSerializer, ClassSerializer)
+                          LoginSerializer, StudentRegistrationSerializer, ClassSerializer, UserSerializer)
 from administrator.serializers import CourseSerializer
 from .models import CustomUser, Administrator, Instructor, Year, Courses
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
+
+
+#Get current user view
+class CurrentUserDashboardView(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+    
+    def get_object(self):
+        return self.request.user
 
 #Admin user registration view
 class AdministratorRegistrationView(generics.GenericAPIView):
