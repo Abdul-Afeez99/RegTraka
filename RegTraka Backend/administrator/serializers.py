@@ -50,7 +50,7 @@ class StudentSerializer(serializers.ModelSerializer):
 class CreateClassroomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Year
-        fields = '__all__'
+        fields = ['name', 'year']
         
 #Serializers for classroom 
 class ClassroomSerializer(serializers.ModelSerializer):
