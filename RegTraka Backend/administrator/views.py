@@ -264,7 +264,10 @@ class StudentListAPIView(ListAPIView):
             output['gender'] = student.gender
             output['matric_no'] = student.matric_no
             result.append(output)
-        return response.Response(result)
+        if len(result) == 0:
+            response.Response('no student registered for the course yet')
+        else:
+            return response.Response(result)
     
 #Get total number of students in a school
 class TotalStudentInSchoolAPIView(ListAPIView):
