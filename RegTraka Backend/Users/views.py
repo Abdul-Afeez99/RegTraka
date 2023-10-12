@@ -35,52 +35,59 @@ class GetAllSchoolsView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
     queryset = Administrator.objects.all()
         
+
 #Get the available classes in a school view
 class ClassroomListAPIView(generics.ListAPIView):
     serializer_class = ClassSerializer
-    queryset = Year.objects.all()
     permission_classes = [permissions.AllowAny]
+    queryset = Year.objects.all()
     @extend_schema(
         parameters=[
             OpenApiParameter(name='school', description='Filter by school name', required=True, type=str),
         ],
     )
     def get(self, request, *args, **kwargs):
-        school = self.request.query_params.get('school')
-        administrator = Administrator.objects.filter(name=school)
-        classrooms = self.queryset.filter(school=administrator)
-        result = []
-        for classroom in classrooms:
-            output = {}
-            output['name'] = classroom.name
-            result.append(output)
+        school_name = self.request.query_params.get('school')
+        if not school_name:
+            return response.Response({"error": "School name is required."}, status=400)
+
+        administrator = Administrator.objects.filter(name=school_name).first()
+        if not administrator:
+            return response.Response({"error": "Administrator not found."}, status=404)
+
+        classrooms = Year.objects.filter(school=administrator)
+        result = [{'name': classroom.name} for classroom in classrooms]
         return response.Response(result)
-    
+     
 # View to get all the courses in the class 
-class ListAllCoursesAPIView(generics.RetrieveAPIView):
+class ListAllCoursesAPIView(generics.ListAPIView):
     serializer_class = CourseSerializer
-    queryset = Courses.objects.all()
     permission_classes = [permissions.AllowAny]
+    queryset = Courses.objects.all()
     @extend_schema(
         parameters=[
             OpenApiParameter(name='school', description='Filter by school name', required=True, type=str),
             OpenApiParameter(name='classroom', description='Filter by classroom', required=True, type=str)
         ],
     )
-    
     def get(self, request, *args, **kwargs):
-        school = self.request.query_params.get('school') # Extract course title from URL
+        school = self.request.query_params.get('school')
         classroom = self.request.query_params.get('classroom')
-        school_object = Administrator.objects.filter(name=school)
-        classroom_object = Year.objects.filter(name=classroom)
-        all_courses = self.queryset.filter(school=school_object, year=classroom_object)
-        available_courses = {}
-        result = []
-        for course in all_courses:
-            result.append(course.title)
-        available_courses['courses'] = result
-        return response.Response(available_courses)
+        
+        school_object = Administrator.objects.filter(name=school).first()
+        classroom_object = Year.objects.filter(name=classroom).first()
 
+        if not (school_object and classroom_object):
+            return response.Response({"error": "School or Classroom not found."}, status=400)
+        
+        all_courses = self.queryset.filter(school=school_object, year=classroom_object)
+        
+        available_courses = {
+            "courses": [course.title for course in all_courses]
+        }
+        
+        return response.Response(available_courses)
+    
 #Login View for users    
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
