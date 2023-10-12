@@ -242,6 +242,16 @@ class StudentListAPIView(ListAPIView):
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     filterset_fields = ['year']
     
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Example of total number of students in class.",
+                value={"name": "student name", 'gender': "MALE", "matric_no": "2016543"},
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+    )
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
         year = self.kwargs['year']

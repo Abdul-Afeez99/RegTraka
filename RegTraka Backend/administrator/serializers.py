@@ -63,7 +63,7 @@ class ClassroomSerializer(serializers.ModelSerializer):
 class ListAllStudentInClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ['name', 'student_in_class']
+        fields = ['name', 'gender', 'matric_no']
         
 class GetCourseSerializer(serializers.ModelSerializer):
     class Meta:
