@@ -145,7 +145,7 @@ class InsructorListAPIView(ListAPIView):
         examples=[
             OpenApiExample(
                 "List all instructors in the school.",
-                value={'email': "example@email.com", 'name': "instructor name", 'gender': "MALE"},
+                value={'id': 1, 'email': "example@email.com", 'name': "instructor name", 'gender': "MALE"},
                 request_only=False,
                 response_only=True,
             ),
@@ -157,6 +157,7 @@ class InsructorListAPIView(ListAPIView):
         result = []
         for instructor in instructors:
             output = {}
+            output['id'] = instructor.pk
             output['email'] = instructor.user.email
             output['name'] = instructor.name
             output['gender'] = instructor.gender
@@ -228,6 +229,7 @@ class ClassroomListAPIView(ListAPIView):
         result = []
         for classroom in classrooms:
             output = {}
+            output['id'] = classroom.pk
             output['name'] = classroom.name
             output['year'] = classroom.year
             result.append(output)
@@ -240,9 +242,9 @@ class StudentListAPIView(RetrieveAPIView):
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     lookup_field = "year"
     
-    def get_queryset(self):
+    def get(self, request, year):
         school = getAdministratorObject(self)
-        return self.queryset.filter(school=school)
+        return self.queryset.filter(school=school, year=year)
     
 #Get total number of students in a school
 class TotalStudentInSchoolAPIView(ListAPIView):
