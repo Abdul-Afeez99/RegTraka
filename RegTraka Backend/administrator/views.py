@@ -236,15 +236,25 @@ class ClassroomListAPIView(ListAPIView):
         return response.Response(result)
 
 # List all the students in a class    
-class StudentListAPIView(RetrieveAPIView):
+class StudentListAPIView(ListAPIView):
     serializer_class = ListAllStudentInClassSerializer
-    queryset = Year.objects.all()
+    queryset = Student.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
-    lookup_field = "year"
+    filterset_fields = ['year']
     
-    def get(self, request, year):
+    def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
-        return self.queryset.filter(school=school, year=year)
+        year = self.kwargs['year']
+        year_obj = Year.objects.filter(school=school, year=year)
+        students = self.queryset.filter(school=school, year=year_obj)
+        result = []
+        for student in students:
+            output = {}
+            output['name'] = student.name
+            output['gender'] = student.gender
+            output['matric_no'] = student.matric_no
+            result.append(output)
+        return response.Response(result)
     
 #Get total number of students in a school
 class TotalStudentInSchoolAPIView(ListAPIView):

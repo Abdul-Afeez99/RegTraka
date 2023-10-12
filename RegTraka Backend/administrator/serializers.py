@@ -61,9 +61,8 @@ class ClassroomSerializer(serializers.ModelSerializer):
         
 #Serializer to list all the students of a class
 class ListAllStudentInClassSerializer(serializers.ModelSerializer):
-    student_in_class = StudentSerializer(many=True, source='student_set')
     class Meta:
-        model = Year
+        model = Student
         fields = ['name', 'student_in_class']
         
 class GetCourseSerializer(serializers.ModelSerializer):
