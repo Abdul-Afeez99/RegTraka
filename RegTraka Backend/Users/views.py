@@ -46,7 +46,7 @@ class ClassroomListAPIView(generics.ListAPIView):
         ],
     )
     def get(self, request, *args, **kwargs):
-        school = self.request.query.params.get('school')
+        school = self.request.query_params.get('school')
         administrator = Administrator.objects.filter(name=school)
         classrooms = self.queryset.filter(school=administrator)
         result = []
@@ -69,8 +69,8 @@ class ListAllCoursesAPIView(generics.RetrieveAPIView):
     )
     
     def get(self, request, *args, **kwargs):
-        school = self.kwargs['school']  # Extract course title from URL
-        classroom = self.kwargs['classroom']
+        school = self.request.query_params.get('school') # Extract course title from URL
+        classroom = self.request.query_params.get('classroom')
         school_object = Administrator.objects.filter(name=school)
         classroom_object = Year.objects.filter(name=classroom)
         all_courses = self.queryset.filter(school=school_object, year=classroom_object)
