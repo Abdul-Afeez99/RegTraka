@@ -9,6 +9,6 @@ urlpatterns = [
     path('user/sign_in', LoginView.as_view(), name="User_login"),
     path('student/registration', StudentRegistrationView.as_view({'post': 'create'}), name="student_registration"),
     path('get_available_schools', GetAllSchoolsView.as_view(), name="All_available_schools"),
-    path('classes_in_school/<str:school>', ClassroomListAPIView.as_view(), name="All_classes_in_school"),
+    path('classes_in_school', ClassroomListAPIView.as_view(), name="All_classes_in_school"),
     path('available_course', ListAllCoursesAPIView.as_view(), name='get_class_courses')
 ]

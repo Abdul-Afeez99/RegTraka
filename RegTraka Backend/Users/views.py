@@ -36,13 +36,17 @@ class GetAllSchoolsView(generics.ListAPIView):
     queryset = Administrator.objects.all()
         
 #Get the available classes in a school view
-class ClassroomListAPIView(generics.RetrieveAPIView):
+class ClassroomListAPIView(generics.ListAPIView):
     serializer_class = ClassSerializer
     queryset = Year.objects.all()
     permission_classes = [permissions.AllowAny]
-    lookup_field = 'school'
-    
-    def get(self, request, school):
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='school', description='Filter by school name', required=True, type=str),
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        school = self.request.query.params.get('school')
         administrator = Administrator.objects.filter(name=school)
         classrooms = self.queryset.filter(school=administrator)
         result = []
@@ -57,7 +61,6 @@ class ListAllCoursesAPIView(generics.RetrieveAPIView):
     serializer_class = CourseSerializer
     queryset = Courses.objects.all()
     permission_classes = [permissions.AllowAny]
-    filter_fields = ('school', 'classroom',)
     @extend_schema(
         parameters=[
             OpenApiParameter(name='school', description='Filter by school name', required=True, type=str),
