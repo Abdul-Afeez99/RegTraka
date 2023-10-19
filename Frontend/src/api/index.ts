@@ -134,3 +134,23 @@ export async function addInstructor(data: {
   ejectInterceptor();
   return response.data;
 }
+export async function addClassroom(data: { name: string; year: number }) {
+  const ejectInterceptor = tokenInterceptors();
+  const response = await api.post("administrator/add-classroom", data);
+  ejectInterceptor();
+  return response.data;
+}
+export async function getAdminClassrooms() {
+  const ejectInterceptor = tokenInterceptors();
+  const response = await api.get<
+    { id: number; name: "string"; year: number }[]
+  >("administrator/list-classrooms");
+  ejectInterceptor();
+  return response.data;
+}
+export async function getSchools() {
+  const response = await api.get<{ id: number; name: "string" }[]>(
+    "get_available_schools"
+  );
+  return response.data;
+}

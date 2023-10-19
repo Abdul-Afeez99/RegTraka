@@ -7,6 +7,9 @@ import {
   getAdminTotalStudents,
   getAdminInstructors,
   addInstructor,
+  getAdminClassrooms,
+  addClassroom,
+  getSchools,
 } from "..";
 
 export const useSignup = createMutation({
@@ -33,4 +36,15 @@ export const useAdminInstructors = createQuery({
 
 export const useAddInstructors = createMutation({
   mutationFn: addInstructor,
+});
+export const useAddClassroom = createMutation({
+  mutationFn: addClassroom,
+});
+export const useAdminClassrooms = createQuery({
+  primaryKey: "adminClassrooms",
+  queryFn: getAdminClassrooms,
+});
+export const useSchools = createQuery({
+  primaryKey: "schools",
+  queryFn: getSchools,
 });
