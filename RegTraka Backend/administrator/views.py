@@ -240,9 +240,11 @@ class StudentListAPIView(ListAPIView):
     serializer_class = ListAllStudentInClassSerializer
     queryset = Student.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
-    filterset_fields = ['year']
     
     @extend_schema(
+        parameters = [
+          OpenApiParameter(name='year', description='Filter by classroom', required=True, type=str),  
+        ],
         examples=[
             OpenApiExample(
                 "Example of total number of students in class.",
@@ -254,9 +256,9 @@ class StudentListAPIView(ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
-        year = self.kwargs['year']
+        year = self.request.query_params.get('year')
         year_obj = Year.objects.filter(school=school, year=year)
-        students = self.queryset.filter(school=school, year=year_obj)
+        students = Student.objects.filter(school=school, year=year_obj)
         result = []
         for student in students:
             output = {}
@@ -264,7 +266,10 @@ class StudentListAPIView(ListAPIView):
             output['gender'] = student.gender
             output['matric_no'] = student.matric_no
             result.append(output)
-        return response.Response(result)
+        if len(result) == 0:
+            response.Response('no student registered for the course yet')
+        else:
+            return response.Response(result)
     
 #Get total number of students in a school
 class TotalStudentInSchoolAPIView(ListAPIView):
