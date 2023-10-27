@@ -12,20 +12,6 @@ class CreateCourseSerializer(serializers.ModelSerializer):
             'credit': {'required': True},
         }
 
-
-    def save(self, **kwargs):
-        school_object = Administrator.objects.get(user=self.context["request"].user)
-        year= self.validated_data['year']
-        instructor = self.validated_data['instructor']
-        year_object = Year.objects.get(name=year, school=school_object)
-        instructor_object = Instructor.objects.get(name=instructor, school=school_object)
-        Courses.objects.create(
-            title=self.validated_data['title'],
-            year=year_object,
-            credit=self.validated_data['credit'],
-            instructor=instructor_object,
-            school=school_object,
-        )
         
 # Serializer for course        
 class CourseSerializer(serializers.ModelSerializer):
