@@ -1,11 +1,14 @@
 from django.urls import path
-from .views import (GetInstructorCoursesAPIView, InstructorInfoView,
+from .views import (GetInstructorCoursesAPIView, InstructorInfoView,CourseCreateAPIView,
                     ViewCourseStudentsAPIView, StartAttendanceView, StopAttendanceView,
-                    GetCourseAttendanceView, GetCourseAttendanceByDateView, CountTotalAttendanceView)
+                    GetCourseAttendanceView, GetCourseAttendanceByDateView, CountTotalAttendanceView,
+                    ClassroomListAPIView)
 
 
 urlpatterns = [
     path("current_instructor", InstructorInfoView.as_view(), name="Welcome-Instructor"),
+    path('create_course', CourseCreateAPIView.as_view(), name="Create Course"),
+    path('list_school_courses', ClassroomListAPIView.as_view(), name="Instructor-school-courses"),
     path("courses", GetInstructorCoursesAPIView.as_view(), name="Instructor-Courses" ),
     path("student_list/<str:title>", ViewCourseStudentsAPIView.as_view(), name="Student-in-class"),
     path("attendance/start", StartAttendanceView.as_view(), name="start_attendance"),

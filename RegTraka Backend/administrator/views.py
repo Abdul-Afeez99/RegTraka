@@ -1,5 +1,5 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView, GenericAPIView
-from .serializers import (CourseSerializer, InstructorSerializer, ClassroomSerializer, StudentSerializer, CreateCourseSerializer,
+from .serializers import (CourseSerializer, InstructorSerializer, ClassroomSerializer, StudentSerializer,
                           ListAllStudentInClassSerializer, IndividualInstructorSerializer, CreateClassroomSerializer)
 from Users.models import Courses, Administrator, Instructor, Year, Student, Attendance, CustomUser
 from rest_framework import permissions, response, status, serializers
@@ -46,15 +46,15 @@ class InstructorRegistrationView(GenericAPIView):
             user_data, status=status.HTTP_201_CREATED
         )   
     
-# Create a new course   
-class CourseCreateAPIView(CreateAPIView):
-    serializer_class = CreateCourseSerializer
-    queryset = Courses.objects.all()
-    permission_classes = [IsAdministrator&permissions.IsAuthenticated]
+# # Create a new course   
+# class CourseCreateAPIView(CreateAPIView):
+#     serializer_class = CreateCourseSerializer
+#     queryset = Courses.objects.all()
+#     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
-    def perform_create(self, serializer):
-        school = getAdministratorObject(self)
-        return serializer.save(school=school)
+#     def perform_create(self, serializer):
+#         school = getAdministratorObject(self)
+#         return serializer.save(school=school)
 
 # list all courses available in the school  
 class CourseListAPIView(ListAPIView):

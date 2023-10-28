@@ -2,15 +2,15 @@ from Users.models import Courses, Instructor, Administrator, Student, Year
 from rest_framework import serializers
 
     
-#Serializer for creating courses
-class CreateCourseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Courses
-        fields = ['title', 'year', 'instructor', 'credit']
-        extra_kwargs = {
-            'title': {'required': True},
-            'credit': {'required': True},
-        }
+# #Serializer for creating courses
+# class CreateCourseSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Courses
+#         fields = ['title', 'year', 'instructor', 'credit']
+#         extra_kwargs = {
+#             'title': {'required': True},
+#             'credit': {'required': True},
+#         }
 
         
 # Serializer for course        

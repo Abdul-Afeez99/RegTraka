@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (CourseListAPIView, CourseDetailAPIView, InsructorListAPIView, 
-                    CourseCreateAPIView,InsructorModifyAPIView, ClassroomCreateAPIView,
+                    InsructorModifyAPIView, ClassroomCreateAPIView,
                     ClassroomListAPIView, StudentListAPIView, StudentAPIView, InstructorRegistrationView,
                     TotalStudentInSchoolAPIView,TotalMaleStudentInSchoolAPIView, TotalFemaleStudentInSchoolAPIView,
                     TotalCoursesInSchoolAPIView, TotalInstructorsInSchoolAPIView, GetCourseAttendanceView, GetCourseAttendanceByDateView,
@@ -9,7 +9,6 @@ from .views import (CourseListAPIView, CourseDetailAPIView, InsructorListAPIView
 
 urlpatterns = [
     path('add_instructor', InstructorRegistrationView.as_view(), name="instructor_registration"),
-    path('create_course', CourseCreateAPIView.as_view(), name="Create Course"),
     path('courses', CourseListAPIView.as_view(), name="Available Courses"),
     path("course/<str:title>", CourseDetailAPIView.as_view(), name="Modify_course"),
     path('instructors', InsructorListAPIView.as_view(), name="Available_Instructors"),

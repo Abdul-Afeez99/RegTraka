@@ -3,9 +3,9 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
 from rest_framework import permissions, response, status
 from rest_framework.views import APIView
 from Users.permissions import IsInstructor
-from Users.models import Instructor, Courses, Student, Attendance
+from Users.models import Instructor, Courses, Student, Attendance, Year
 from Users.serializers import UserSerializer
-from .serializers import AllCourseStudentSerializer, AttendanceSerializer
+from .serializers import AllCourseStudentSerializer, AttendanceSerializer, CreateCourseSerializer, ClassSerializer
 import os, pickle, cv2, face_recognition, time
 import numpy as np
 import threading
@@ -103,7 +103,41 @@ class InstructorInfoView(RetrieveAPIView):
             result['school'] = info.school.name
             result['gender'] = info.gender
         return response.Response(result, status=status.HTTP_200_OK)
-            
+
+# Get all classes in the instructor school
+class ClassroomListAPIView(ListAPIView):
+    serializer_class = ClassSerializer
+    permission_classes = [IsInstructor&permissions.IsAuthenticated]
+    queryset = Year.objects.all()
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='school', description='Filter by school name', required=True, type=str),
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        instructor = Instructor.objects.get(user=self.request.user)
+        school = instructor.school
+        classrooms = self.queryset.filter(school=school)
+        result = []
+        for classroom in classrooms:
+            output = {}
+            output['id'] = classroom.pk
+            output['name'] = classroom.name
+            output['year'] = classroom.year
+            result.append(output)
+        return response.Response(result)
+     
+           
+# Create a new course   
+class CourseCreateAPIView(CreateAPIView):
+    serializer_class = CreateCourseSerializer
+    queryset = Courses.objects.all()
+    permission_classes = [IsInstructor&permissions.IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        instructor = Instructor.objects.get(user=self.request.user)
+        school = instructor.school
+        return serializer.save(instructor=instructor, school=school)
 
 # Get the instructor courses
 class GetInstructorCoursesAPIView(ListAPIView):
