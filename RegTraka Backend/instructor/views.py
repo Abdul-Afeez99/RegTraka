@@ -109,11 +109,7 @@ class ClassroomListAPIView(ListAPIView):
     serializer_class = ClassSerializer
     permission_classes = [IsInstructor&permissions.IsAuthenticated]
     queryset = Year.objects.all()
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(name='school', description='Filter by school name', required=True, type=str),
-        ],
-    )
+    
     def get(self, request, *args, **kwargs):
         instructor = Instructor.objects.get(user=self.request.user)
         school = instructor.school
@@ -184,7 +180,7 @@ class StartAttendanceView(APIView):
     )
     def post(self, request):
         global attendance_process_active
-        course_title = request.query_params.get('title')
+        course_title = self.request.query_params.get('title')
         encodeStudentImage(course_title)
         if not attendance_process_active:
             # Start a new thread for the attendance process
@@ -207,7 +203,7 @@ class StopAttendanceView(APIView):
     )
     def post(self, request):
         global attendance_process_active
-        course_title = request.query_params.get('title')
+        course_title = self.request.query_params.get('title')
         if attendance_process_active:
             # Stop the attendance process
             attendance_process_active = False
@@ -221,9 +217,11 @@ class GetCourseAttendanceView(ListAPIView):
     serializer_class = AttendanceSerializer
     permission_classes = [IsInstructor&permissions.IsAuthenticated]
     queryset = Attendance.objects.all()
-    lookup_field = "course"
     
     @extend_schema(
+        parameters = [
+          OpenApiParameter(name='course', description='course', required=True, type=str),  
+        ],
         examples=[
             OpenApiExample(
                 "Example of attendace",
@@ -235,9 +233,10 @@ class GetCourseAttendanceView(ListAPIView):
         ],
         description="Get a particular course atttendance"
     )
-    def get(self, request, course):
-        course = Courses.objects.filter(title=course) 
-        course_attendance = self.queryset.filter(course=course).order_by('-date')
+    def get(self, request, *args, **kwargs):
+        course = self.request.query_params.get('course')
+        course_obj = Courses.objects.filter(title=course) 
+        course_attendance = self.queryset.filter(course=course_obj).order_by('-date')
         result = []
         for attendance in course_attendance:
             student_atendance = {}
@@ -252,7 +251,6 @@ class GetCourseAttendanceByDateView(RetrieveAPIView):
     serializer_class = AttendanceSerializer
     permission_classes = [IsInstructor&permissions.IsAuthenticated]
     queryset = Attendance.objects.all()
-    filterset_fields = ['course', 'date']
     @extend_schema(
         parameters=[
             OpenApiParameter(name='course', description='Filter by course title', required=True, type=str),
@@ -270,8 +268,8 @@ class GetCourseAttendanceByDateView(RetrieveAPIView):
         description= "Get the list of course attendance for a particular day"
     )
     def get(self, request, *args, **kwargs):
-        course_title = self.kwargs['course']  # Extract course title from URL
-        date = self.kwargs['date']
+        course_title = self.request.query_params.get('course')  # Extract course title from URL
+        date = self.request.query_params.get('date')
         course = Courses.objects.filter(title=course_title).first()
         course_attendance = self.queryset.filter(course=course, date=date)
         result = []
