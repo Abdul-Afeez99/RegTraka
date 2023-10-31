@@ -236,7 +236,7 @@ class GetCourseAttendanceView(ListAPIView):
     def get(self, request, *args, **kwargs):
         course = self.request.query_params.get('course')
         course_obj = Courses.objects.filter(title=course) 
-        course_attendance = self.queryset.filter(course=course_obj).order_by('-date')
+        course_attendance = self.queryset.filter(course=course_obj)
         result = []
         for attendance in course_attendance:
             student_atendance = {}
