@@ -227,8 +227,6 @@ class GetCourseAttendanceView(ListAPIView):
                 "Example of attendace",
                 value={"date": '22/1/2023', "name": "AbdulAfeez", 
                        "matric_no": "20171469"},
-                request_only=False,
-                response_only=True,
             ),
         ],
         description="Get a particular course atttendance"
@@ -236,7 +234,7 @@ class GetCourseAttendanceView(ListAPIView):
     def get(self, request, *args, **kwargs):
         course = self.request.query_params.get('course')
         course_obj = Courses.objects.filter(title=course) 
-        course_attendance = self.queryset.filter(course=course_obj)
+        course_attendance = self.queryset.filter(course=course_obj[:1])
         result = []
         for attendance in course_attendance:
             student_atendance = {}
