@@ -2,7 +2,12 @@ import React from "react";
 import { Flex, Text, Button, Title, Subtitle } from "@tremor/react";
 import { toast } from "sonner";
 import LoginImage from "@/assets/login.png";
-import { useRegisterStudent, useSchools } from "@/api/hooks";
+import {
+  useAvailableCourses,
+  useClasses,
+  useRegisterStudent,
+  useSchools,
+} from "@/api/hooks";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -15,6 +20,8 @@ const registerSchema = z.object({
   }),
   gender: z.enum(["MALE", "FEMALE"]),
   school: z.string(),
+  year: z.string(),
+  course: z.string(),
 });
 
 type RegisterSchema = z.infer<typeof registerSchema>;
@@ -25,6 +32,18 @@ function Register() {
     resolver: zodResolver(registerSchema),
   });
   const { data: schools } = useSchools();
+  // cohools && console.log(schools);
+  const school = watch("school");
+  const year = watch("year");
+  const { data: classes } = useClasses({
+    variables: { schoolName: school },
+    enabled: !!school,
+  });
+  const { data: courses } = useAvailableCourses({
+    variables: { school, classroom: year },
+    enabled: !!school && !!year,
+  });
+
   const image = watch("image");
   let imagePreview: string | null = null;
   const firstImage = image?.[0];
@@ -98,6 +117,19 @@ function Register() {
               className="rounded-lg border-gray-200 border py-1 pl-2 w-full"
             >
               {schools?.map(({ name }, i) => (
+                <option value={name} key={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </Flex>
+          <Flex alignItems="start" flexDirection={"col"}>
+            <Text>Year</Text>
+            <select
+              {...register("year")}
+              className="rounded-lg border-gray-200 border py-1 pl-2 w-full"
+            >
+              {classes?.map(({ name }, i) => (
                 <option value={i + 1} key={name}>
                   {name}
                 </option>
@@ -107,29 +139,17 @@ function Register() {
           <Flex alignItems="start" flexDirection={"col"}>
             <Text>Courses</Text>
             <select
-              {...register("school")}
+              {...register("course")}
               className="rounded-lg border-gray-200 border py-1 pl-2 w-full"
             >
-              {schools?.map(({ name }, i) => (
+              {courses?.map(({ name }, i) => (
                 <option value={i + 1} key={name}>
                   {name}
                 </option>
               ))}
             </select>
           </Flex>
-          <Flex alignItems="start" flexDirection={"col"}>
-            <Text>Year</Text>
-            <select
-              {...register("school")}
-              className="rounded-lg border-gray-200 border py-1 pl-2 w-full"
-            >
-              {schools?.map(({ name }, i) => (
-                <option value={i + 1} key={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </Flex>
+
           <Flex alignItems="start" flexDirection={"col"}>
             <Text>Image</Text>
             {firstImage && (

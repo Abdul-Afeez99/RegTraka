@@ -13,8 +13,8 @@ const signUpSchema = z.object({
   password: z
     .string()
     .min(1, "Email is required")
-    .min(12, "Password must be more than 11 characters")
-    .max(50),
+    // .min(12, "Password must be more than 11 characters")
+    // .max(50),
 });
 
 type SignUpSchema = z.infer<typeof signUpSchema>;

@@ -154,3 +154,74 @@ export async function getSchools() {
   );
   return response.data;
 }
+export async function getClasses(schoolName: string) {
+  const response = await api.get<{ name: "string" }[]>(
+    `classes_in_school?school=${schoolName}`
+  );
+  return response.data;
+}
+export async function getAvailableCourses(data: {
+  classroom: string;
+  school: string;
+}) {
+  const response = await api.get<{ course: any[] }>(
+    `available_course?classroom=${data.classroom}&school=${data.school}`
+  );
+  return response.data;
+}
+
+// INSTRUCTOR ENDPOINTS
+
+export async function getInstructorCourses() {
+  const ejectInterceptor = tokenInterceptors();
+  const response = await api.get<{
+    name: string;
+    courses: {
+      title: string;
+      year: number;
+      credit: number;
+    }[];
+  }>("/instructor/courses");
+  ejectInterceptor();
+  return response.data;
+}
+export async function getInstructorSchoolClasses() {
+  const ejectInterceptor = tokenInterceptors();
+  const response = await api.get<
+    {
+      id: number;
+      name: string;
+      year: number;
+    }[]
+  >("instructor/list_school_classes");
+  ejectInterceptor();
+  return response.data;
+}
+export async function getAttendance({ course }: { course: string }) {
+  const ejectInterceptor = tokenInterceptors();
+  const response = await api.get<
+    {
+      date: string;
+      name: string;
+      matric_no: string;
+    }[]
+  >(`instructor/attendance?course=${course}`);
+  ejectInterceptor();
+  return response.data;
+}
+export async function createInstructorCourse(data: {
+  title: string;
+  year: number;
+  credit: number;
+}) {
+  const ejectInterceptor = tokenInterceptors();
+  const response = await api.post<
+    {
+      id: number;
+      name: string;
+      year: number;
+    }[]
+  >("/instructor/create_course", data);
+  ejectInterceptor();
+  return response.data;
+}

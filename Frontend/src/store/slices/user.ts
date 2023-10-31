@@ -5,7 +5,7 @@ type User = {
   email: string;
   name: string;
   refresh: string;
-  role: "administrator" | "teacher" | "student";
+  role: "administrator" | "instructor" | "student";
 };
 export interface UserSlice {
   user?: User;

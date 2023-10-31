@@ -1,6 +1,5 @@
 import { useAddInstructors, useAdminInstructors } from "@/api/hooks";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
   Card,
@@ -18,8 +17,9 @@ import {
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import Modal from "@/components/base/Modal";
 
 function Instructor() {
