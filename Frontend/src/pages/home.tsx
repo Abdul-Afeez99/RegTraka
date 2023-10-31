@@ -4,8 +4,11 @@ import { Navigate } from "react-router-dom";
 
 const Home = () => {
   const user = useStore((state) => state.user);
-  if (user) {
-    return <Navigate replace to="/dashboard" />;
+
+  if (user?.role === "instructor") {
+    return <Navigate replace to="/instructor/dashboard" />;
+  } else if (user?.role === "administrator") {
+    return <Navigate replace to="/admin/dashboard" />;
   }
   return <Navigate replace to="/login" />;
 };
