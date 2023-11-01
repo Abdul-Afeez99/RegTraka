@@ -1,5 +1,5 @@
 from administrator.serializers import IndividualInstructorSerializer, CourseSerializer
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, GenericAPIView
 from rest_framework import permissions, response, status
 from rest_framework.views import APIView
 from Users.permissions import IsInstructor
@@ -18,75 +18,82 @@ attendance_process_active = False
 
 # function to encode student image    
 def encodeStudentImage(title):
-    course = Courses.objects.get(title=title)
-    students = Student.objects.filter(courses=course)
-    file_path = os.getcwd()
-    file_name = 'media/images'
-    file_path = os.path.join(file_path, file_name)
-    student_images_list = []
-    student_matric_no = []
-    for student in students:
-        student_images_list.append(os.path.join(file_path, student.image))
-        student_matric_no.append(os.path.splitext(student.image)[0])    
-    encodings = []
-    for img in student_images_list:
-        img = cv2.imread(img)
-        image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        encoder = face_recognition.face_encodings(image)[0]
-        encodings.append(encoder)
-    encodeListKnownWithMatricNo = [encodings, student_matric_no]
-    file = open("EncodeFile.p", "wb")
-    pickle.dump(encodeListKnownWithMatricNo, file)
-    file.close()
-        
-        
-# Function to start attendance process   
-def start_attendance_process(self):
+    try:
+        course = Courses.objects.get(title=title)
+        students = Student.objects.filter(courses=course)
+        file_path = os.getcwd()
+        file_name = 'media/images'
+        file_path = os.path.join(file_path, file_name)
+        student_images_list = []
+        student_matric_no = []
+        for student in students:
+            student_images_list.append(os.path.join(file_path, student.image))
+            student_matric_no.append(os.path.splitext(student.image)[0])
+        encodings = []
+        for img in student_images_list:
+            img = cv2.imread(img)
+            image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            encoder = face_recognition.face_encodings(image)[0]
+            encodings.append(encoder)
+        encodeListKnownWithMatricNo = [encodings, student_matric_no]
+        with open("EncodeFile.p", "wb") as file:
+            pickle.dump(encodeListKnownWithMatricNo, file)
+    except Exception as e:
+        print(f"Error in encodeStudentImage: {e}")        
+
+# Function to start attendance process
+def start_attendance_process():
     global attendance_process_active
     global list_of_student
-    src = 0 #add the camera src
+    src = 0  # Replace with the correct camera source
     capture = cv2.VideoCapture(src, cv2.CAP_DSHOW)
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    
-    FPS = 1/30
+
+    FPS = 1 / 30
     FPS_MS = int(FPS * 1000)
-    # Load encoding file only once
-    with open('EncodeFile.p', 'rb') as file:
-        encodeListKnownWithIDs = pickle.load(file)
-    file.close()    
-    encodeListKnown, matric_no = encodeListKnownWithIDs
-    while attendance_process_active:
-        if capture.isOpened():
-            success, img = capture.read()
-            if success:
-                image = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
-                faceCurFrame = face_recognition.face_locations(image)
-                encodeCurFrame = face_recognition.face_encodings(image, faceCurFrame)
-                # Process matches here
-                for encodeFace in encodeCurFrame:
-                    matches = face_recognition.compare_faces(encodeListKnown, encodeFace, tolerance=0.4)
-                    matches_array = np.array(matches)
-                    indices = np.where(matches_array==True)[0]
-                    for index in indices:
-                        if matric_no[index] not in list_of_student:
-                            list_of_student.append(matric_no[index])
-                        else:
-                            continue
-                    
-        # Sleep for a short duration to control frame rate
-        time.sleep(self.FPS)
-    # Release the video capture object when attendance process is stopped
-    capture.release()
-    cv2.destroyAllWindows()
+
+    try:
+        # Load encoding file only once
+        with open('EncodeFile.p', 'rb') as file:
+            encodeListKnownWithIDs = pickle.load(file)
+        encodeListKnown, matric_no = encodeListKnownWithIDs
+
+        while attendance_process_active:
+            if capture.isOpened():
+                success, img = capture.read()
+                if success:
+                    image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                    faceCurFrame = face_recognition.face_locations(image)
+                    encodeCurFrame = face_recognition.face_encodings(image, faceCurFrame)
+                    # Process matches here
+                    for encodeFace in encodeCurFrame:
+                        matches = face_recognition.compare_faces(encodeListKnown, encodeFace, tolerance=0.4)
+                        matches_array = np.array(matches)
+                        indices = np.where(matches_array == True)[0]
+                        for index in indices:
+                            if matric_no[index] not in list_of_student:
+                                list_of_student.append(matric_no[index])
+                
+                # Sleep for a short duration to control frame rate                
+                time.sleep(FPS)
+        # Release the video capture object when attendance process is stopped        
+        capture.release()
+        cv2.destroyAllWindows()
+    except Exception as e:
+        print(f"Error in start_attendance_process: {e}")          
 
 # Function to mark the attendance
-def markStudent(serializer, course_title, student_list):
-    for student_no in student_list:
-        student_obj = Student.objects.filter(matric_no=student_no)
-        course_obj = Courses.objects.filter(title = course_title)
-        is_present = True
-        serializer.save(student=student_obj, course=course_obj, is_present=is_present)
-
+def markStudent(course_title, student_list):
+    try:
+        for student_no in student_list:
+            student_obj = Student.objects.get(matric_no=student_no)
+            course_obj = Courses.objects.get(title=course_title)
+            is_present = True
+            serializer = AttendanceSerializer(data={'student': student_obj, 'course': course_obj, 'is_present': is_present})
+            if serializer.is_valid():
+                serializer.save()
+    except Exception as e:
+        print(f"Error in markStudent: {e}")
 
 # Get the current instructor information
 class InstructorInfoView(RetrieveAPIView):
@@ -171,10 +178,11 @@ class ViewCourseStudentsAPIView(RetrieveAPIView):
 
 # Start attendance API View
 class StartAttendanceView(APIView):
-    permission_classes = [IsInstructor&permissions.IsAuthenticated]
+    permission_classes = [IsInstructor & permissions.IsAuthenticated]
     serializer_class = None
+
     @extend_schema(
-        parameters=[
+       parameters=[
             OpenApiParameter(name='title', description='Filter by course title', required=True, type=str)
         ],
     )
@@ -187,10 +195,10 @@ class StartAttendanceView(APIView):
             attendance_process_active = True
             attendance_thread = threading.Thread(target=start_attendance_process)
             attendance_thread.start()
-
             return response.Response({"message": "Attendance process started."}, status=status.HTTP_200_OK)
         else:
             return response.Response({"message": "Attendance process is already active."}, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Stop and save attendance API View
 class StopAttendanceView(APIView):
@@ -207,7 +215,7 @@ class StopAttendanceView(APIView):
         if attendance_process_active:
             # Stop the attendance process
             attendance_process_active = False
-            markStudent(serializer=self.serializer_class, course_title=course_title, student_list=list_of_student)
+            markStudent(course_title, list_of_student)
             return response.Response({"message": "Attendance process stopped."}, status=status.HTTP_200_OK)
         else:
             return response.Response({"message": "No active attendance process to stop."}, status=status.HTTP_400_BAD_REQUEST)
