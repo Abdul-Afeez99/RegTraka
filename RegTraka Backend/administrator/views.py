@@ -236,9 +236,8 @@ class ClassroomListAPIView(ListAPIView):
         return response.Response(result)
 
 # List all the students in a class    
-class StudentListAPIView(ListAPIView):
+class StudentListAPIView(GenericAPIView):
     serializer_class = ListAllStudentInClassSerializer
-    queryset = Student.objects.all()
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
     @extend_schema(
@@ -257,8 +256,8 @@ class StudentListAPIView(ListAPIView):
     def get(self, request, *args, **kwargs):
         school = getAdministratorObject(self)
         year = self.request.query_params.get('year')
-        year_obj = Year.objects.filter(school=school, year=year)
-        students = Student.objects.filter(school=school, year=year_obj)
+        year_obj = Year.objects.get(school=school, name=year)
+        students = Student.objects.filter(school=school.pk, year=year_obj.pk)
         result = []
         for student in students:
             output = {}
