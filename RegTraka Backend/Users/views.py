@@ -30,14 +30,13 @@ class AdministratorRegistrationView(generics.GenericAPIView):
         )
 
 #Get all schools view
-class GetAllSchoolsView(generics.ListAPIView):
+class GetAllSchoolsView(generics.GenericAPIView):
     serializer_class = AdministratorSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = Administrator.objects.all()
     
     def get(self, request, *args, **kwargs):
         all_schools=[]
-        for schools in self.queryset:
+        for schools in Administrator.objects.all():
             school = {}
             school['pk'] = schools.pk
             school['name'] = schools.name
