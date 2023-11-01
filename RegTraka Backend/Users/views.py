@@ -58,7 +58,7 @@ class ClassroomListAPIView(generics.ListAPIView):
         if not school_name:
             return response.Response({"error": "School name is required."}, status=400)
 
-        administrator = Administrator.objects.filter(name=school_name).first()
+        administrator = Administrator.objects.get(name=school_name)
         if not administrator:
             return response.Response({"error": "Administrator not found."}, status=404)
 
