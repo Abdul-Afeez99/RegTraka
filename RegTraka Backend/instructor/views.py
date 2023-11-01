@@ -89,7 +89,7 @@ def markStudent(course_title, student_list):
             student_obj = Student.objects.get(matric_no=student_no)
             course_obj = Courses.objects.get(title=course_title)
             is_present = True
-            serializer = AttendanceSerializer(data={'student': student_obj, 'course': course_obj, 'is_present': is_present})
+            serializer = AttendanceSerializer(data={'student': student_obj.pk, 'course': course_obj.pk, 'is_present': is_present})
             if serializer.is_valid():
                 serializer.save()
     except Exception as e:
