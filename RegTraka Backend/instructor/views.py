@@ -27,8 +27,8 @@ def encodeStudentImage(title):
         student_images_list = []
         student_matric_no = []
         for student in students:
-            student_images_list.append(os.path.join(file_path, student.image))
-            student_matric_no.append(os.path.splitext(student.image)[0])
+            student_images_list.append(os.path.join(file_path, student.image.path))
+            student_matric_no.append(os.path.splitext(student.image.path)[0])
         encodings = []
         for img in student_images_list:
             img = cv2.imread(img)
