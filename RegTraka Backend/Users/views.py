@@ -65,8 +65,8 @@ class ClassroomListAPIView(generics.GenericAPIView):
         result = []
         for i in classrooms:
             classroom = {}
-            classrooms['pk'] = i.pk
-            classrooms['name'] = i.name
+            classroom['pk'] = i.pk
+            classroom['name'] = i.name
             result.append(classroom)
         return response.Response(result)
      
