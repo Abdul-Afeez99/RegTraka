@@ -85,12 +85,12 @@ class ListAllCoursesAPIView(generics.GenericAPIView):
         classroom = self.request.query_params.get('classroom')
         
         school_object = Administrator.objects.get(name=school)
-        classroom_object = Year.objects.filter(name=classroom).first()
+        classroom_object = Year.objects.get(name=classroom, school=school_object)
 
         if not (school_object and classroom_object):
             return response.Response({"error": "School or Classroom not found."}, status=400)
         
-        all_courses = self.queryset.filter(school=school_object, year=classroom_object)
+        all_courses = Courses.objects.filter(school=school_object, year=classroom_object)
         available_courses = []
         for course in all_courses:
             available_course = {}
