@@ -34,7 +34,15 @@ class GetAllSchoolsView(generics.ListAPIView):
     serializer_class = AdministratorSerializer
     permission_classes = [permissions.AllowAny]
     queryset = Administrator.objects.all()
-        
+    
+    def get(self, request, *args, **kwargs):
+        all_schools=[]
+        for schools in self.queryset:
+            school = {}
+            school['pk'] = schools.pk
+            school['name'] = schools.name
+            all_schools.append(school)
+        return response.Response(all_schools)
 
 #Get the available classes in a school view
 class ClassroomListAPIView(generics.ListAPIView):
@@ -56,7 +64,12 @@ class ClassroomListAPIView(generics.ListAPIView):
             return response.Response({"error": "Administrator not found."}, status=404)
 
         classrooms = Year.objects.filter(school=administrator)
-        result = [{'name': classroom.name} for classroom in classrooms]
+        result = []
+        for i in classrooms:
+            classroom = {}
+            classrooms['pk'] = i.pk
+            classrooms['name'] = i.name
+            result.append(classroom)
         return response.Response(result)
      
 # View to get all the courses in the class 
@@ -81,10 +94,12 @@ class ListAllCoursesAPIView(generics.ListAPIView):
             return response.Response({"error": "School or Classroom not found."}, status=400)
         
         all_courses = self.queryset.filter(school=school_object, year=classroom_object)
-        
-        available_courses = {
-            "courses": [course.title for course in all_courses]
-        }
+        available_courses = []
+        for course in all_courses:
+            available_course = {}
+            available_course['pk'] = course.pk
+            available_course['title'] = course.title
+            available_courses.append(available_course)
         
         return response.Response(available_courses)
     
