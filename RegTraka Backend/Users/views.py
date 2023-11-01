@@ -44,10 +44,10 @@ class GetAllSchoolsView(generics.GenericAPIView):
         return response.Response(all_schools)
 
 #Get the available classes in a school view
-class ClassroomListAPIView(generics.ListAPIView):
+class ClassroomListAPIView(generics.GenericAPIView):
     serializer_class = ClassSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = Year.objects.all()
+
     @extend_schema(
         parameters=[
             OpenApiParameter(name='school', description='Filter by school name', required=True, type=str),
@@ -61,7 +61,6 @@ class ClassroomListAPIView(generics.ListAPIView):
         administrator = Administrator.objects.get(name=school_name)
         if not administrator:
             return response.Response({"error": "Administrator not found."}, status=404)
-
         classrooms = Year.objects.filter(school=administrator)
         result = []
         for i in classrooms:
@@ -72,10 +71,9 @@ class ClassroomListAPIView(generics.ListAPIView):
         return response.Response(result)
      
 # View to get all the courses in the class 
-class ListAllCoursesAPIView(generics.ListAPIView):
+class ListAllCoursesAPIView(generics.GenericAPIView):
     serializer_class = CourseSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = Courses.objects.all()
     @extend_schema(
         parameters=[
             OpenApiParameter(name='school', description='Filter by school name', required=True, type=str),
@@ -86,7 +84,7 @@ class ListAllCoursesAPIView(generics.ListAPIView):
         school = self.request.query_params.get('school')
         classroom = self.request.query_params.get('classroom')
         
-        school_object = Administrator.objects.filter(name=school).first()
+        school_object = Administrator.objects.get(name=school)
         classroom_object = Year.objects.filter(name=classroom).first()
 
         if not (school_object and classroom_object):
