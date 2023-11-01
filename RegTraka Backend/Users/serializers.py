@@ -132,3 +132,25 @@ class StudentRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = '__all__'
+        
+    # def save(self, **kwargs):
+    #     school = self.initial_data['school']
+    #     year = self.initial_data['year']
+    #     courses = self.initial_data['courses']
+    #     school_object = Administrator.objects.get(name=school)
+    #     year_object = Year.objects.get(name=year, school=school_object)
+    #     course_object = []
+    #     for course in courses:
+    #         course= Courses.objects.get(title=course, school=school_object)
+    #         course_object.append(course)
+        
+    #     Student.objects.create(
+    #         name = self.validated_data['name'],
+    #         school = school_object,
+    #         matric_no = self.validated_data['matric_no'],
+    #         year = year_object,
+    #         gender = self.validated_data['gender'],
+    #         image = self.validated_data['image'],
+    #         courses = 
+    #     )
+         
