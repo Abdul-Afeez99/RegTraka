@@ -37,7 +37,7 @@ class GetAllSchoolsView(generics.ListAPIView):
     
     def get(self, request, *args, **kwargs):
         all_schools=[]
-        for schools in self.queryset:
+        for schools in self.queryset.all():
             school = {}
             school['pk'] = schools.pk
             school['name'] = schools.name
