@@ -17,6 +17,7 @@ import {
 export default function StudentListTable({
   data,
   course,
+  refetch,
 }: {
   data: {
     date: string;
@@ -24,9 +25,10 @@ export default function StudentListTable({
     matric_no: string;
   }[];
   course: string;
+  refetch: () => void;
 }) {
   const { mutate: startAttendace, isLoading } = useStartAttendance();
-  const { mutate: stopAttendance, isLoading: isStopAttendanceLoading } =
+  const { mutateAsync: stopAttendance, isLoading: isStopAttendanceLoading } =
     useStopAttendance();
   return (
     <Card>
@@ -40,7 +42,7 @@ export default function StudentListTable({
             Start Attendance
           </Button>
           <Button
-            onClick={() => stopAttendance({ course })}
+            onClick={() => stopAttendance({ course }).then(() => refetch())}
             loading={isStopAttendanceLoading}
           >
             Stop Attendance
