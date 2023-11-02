@@ -292,7 +292,7 @@ class TotalStudentInSchoolAPIView(ListAPIView):
         return response.Response(result)
     
 # Get total male students in a school
-class TotalStudentInfoInSchoolAPIView(ListAPIView):
+class TotalStudentInfoInSchoolAPIView(GenericAPIView):
     serializer_class = StudentSerializer
     permission_classes = [IsAdministrator&permissions.IsAuthenticated]
     
