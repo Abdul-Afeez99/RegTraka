@@ -25,8 +25,7 @@ a user interface for the regtraka attendance system built by Abdulafeez.[[link t
     ├── /dashboard
     ├── /students
     │    └── :courseId
-    ├── /instructor
-    └── /attendance
+    └── /instructor
 ```
 
 ## Deployment
