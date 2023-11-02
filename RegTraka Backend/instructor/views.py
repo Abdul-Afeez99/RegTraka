@@ -83,15 +83,21 @@ def start_attendance_process():
         print(f"Error in start_attendance_process: {e}")          
 
 # Function to mark the attendance
-def markStudent(course_title, student_list):
+def markStudent(course_title, student_list):        
     try:
         for student_no in student_list:
-            student_obj = Student.objects.get(matric_no=student_no)
-            course_obj = Courses.objects.get(title=course_title)
-            is_present = True
-            serializer = AttendanceSerializer(data={'student': student_obj, 'course': course_obj, 'is_present': is_present})
-            if serializer.is_valid():
-                serializer.save()
+            # Check if the student with the given matric_no exists
+            student_obj = Student.objects.filter(matric_no=student_no).first()
+            if student_obj:
+                course_obj = Courses.objects.get(title=course_title)
+                is_present = True
+                serializer = AttendanceSerializer(data={'student': student_obj, 'course': course_obj, 'is_present': is_present})
+                if serializer.is_valid():
+                    serializer.save()
+                else:
+                    print(f"Error in markStudent - Serializer is not valid: {serializer.errors}")
+            else:
+                print(f"Error in markStudent - Student with matric_no {student_no} does not exist.")
     except Exception as e:
         print(f"Error in markStudent: {e}")
 

@@ -309,8 +309,8 @@ class TotalStudentInfoInSchoolAPIView(ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         school = Administrator.objects.get(user=self.request.user)
-        total_male_students = Student.objects.filter(school=school, gender='Male').count()
-        total_female_students = Student.objects.filter(school=school, gender='Female').count()
+        total_male_students = Student.objects.filter(school=school, gender='MALE').count()
+        total_female_students = Student.objects.filter(school=school, gender='FEMALE').count()
         result = {"Total_male_student": total_male_students, 
                   "Total_female_student": total_female_students}
         return response.Response(result)
