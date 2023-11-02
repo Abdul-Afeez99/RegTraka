@@ -7,9 +7,11 @@ import {
 } from "@heroicons/react/24/solid";
 import AttendanceChart from "@/components/inc/AttendanceChart";
 import useStore from "@/store";
+import { useInstructorCourses } from "@/api/hooks";
 
 function Dashboard() {
   const { name } = useStore((s) => s.user!);
+  const { data: instructorCourses } = useInstructorCourses();
 
   return (
     <section className="px-5 my-8">
@@ -22,28 +24,28 @@ function Dashboard() {
           <Card className="flex">
             <Icon size="xl" icon={AcademicCapIcon} />
             <div className="flex flex-col gap-2">
-              <Metric>200</Metric>
-              <Text>TOTAL STUDENTS</Text>
+              <Metric>{instructorCourses?.courses.length}</Metric>
+              <Text>TOTAL COURSES</Text>
             </div>
           </Card>
         </Col>
         <Col numColSpan={1} numColSpanLg={2}>
-          <Card className="flex" decoration="top" decorationColor="orange">
+          {/* <Card className="flex" decoration="top" decorationColor="orange">
             <Icon size="xl" icon={ArrowRightOnRectangleIcon} />
             <div className="flex flex-col gap-2">
               <Metric>50</Metric>
               <Text>PRESENT TODAY</Text>
             </div>
-          </Card>
+          </Card> */}
         </Col>
         <Col numColSpan={1} numColSpanLg={2}>
-          <Card className="flex">
+          {/* <Card className="flex">
             <Icon size="xl" icon={ArrowLeftOnRectangleIcon} />
             <div className="flex flex-col gap-2">
               <Metric>10</Metric>
               <Text>ABSENT TODAY</Text>
             </div>
-          </Card>
+          </Card> */}
         </Col>
         <Col numColSpan={1} numColSpanMd={2} numColSpanLg={6}>
           <AttendanceChart />

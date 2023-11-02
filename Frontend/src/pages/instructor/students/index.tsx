@@ -86,14 +86,6 @@ function AddInstructorForm() {
           placeholder="Enter Title"
           errors={errors}
         />
-        {/* <Flex alignItems="start" flexDirection="col">
-            <Text>Title</Text>
-            <input
-              type="text"
-              className="rounded-lg border-gray-200 border py-1 pl-2 w-full"
-              {...register("title")}
-            />
-          </Flex> */}
         <Flex alignItems="start" flexDirection={"col"}>
           <Text>Year</Text>
           <select

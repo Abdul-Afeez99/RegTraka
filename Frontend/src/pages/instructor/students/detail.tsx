@@ -1,9 +1,6 @@
-import useStore from "@/store";
-import React from "react";
-import { Navigate, Link, useParams } from "react-router-dom";
-import { Button } from "@tremor/react";
-import StudentListTable from "@/components/inc/StudentListTable";
 import { useAttendance } from "@/api/hooks";
+import StudentListTable from "@/components/inc/StudentListTable";
+import { useParams } from "react-router-dom";
 
 function StudentList() {
   const params = useParams();
@@ -15,7 +12,11 @@ function StudentList() {
   });
   return (
     <section className="px-5 my-8 flex flex-col gap-8">
-      <StudentListTable data={attendance} {...{ course }} refetch={refetch} />
+      <StudentListTable
+        data={attendance ?? []}
+        {...{ course }}
+        refetch={refetch}
+      />
     </section>
   );
 }
