@@ -35,7 +35,11 @@ function Students() {
         ) : (
           <>
             {courses?.map((course) => (
-              <Courses key={course.name} year={course.year} />
+              <Courses
+                key={course.name}
+                year={course.year}
+                name={course.name}
+              />
             ))}
           </>
         )}
@@ -43,7 +47,7 @@ function Students() {
     </section>
   );
 }
-function Courses({ year }: { year: number }) {
+function Courses({ year, name }: { year: number; name: string }) {
   return (
     <section className="px-4 py-6 rounded-md bg-primary/30 flex justify-between items-center">
       <h2>
@@ -51,7 +55,7 @@ function Courses({ year }: { year: number }) {
         <span className="font-medium text-md">level</span>
       </h2>
       <Button>
-        <Link to={`/admin/students/${year}`}>View Details</Link>
+        <Link to={`/admin/students/${name}`}>View Details</Link>
       </Button>
     </section>
   );

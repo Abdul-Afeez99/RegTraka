@@ -11,6 +11,7 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { MultiSelect, MultiSelectItem } from "@tremor/react";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -21,30 +22,48 @@ const registerSchema = z.object({
   gender: z.enum(["MALE", "FEMALE"]),
   school: z.string(),
   year: z.string(),
-  course: z.string(),
+  course: z.array(z.string()),
 });
 
 type RegisterSchema = z.infer<typeof registerSchema>;
 
 function Register() {
-  const { mutateAsync, isLoading } = useRegisterStudent();
-  const { register, handleSubmit, watch, reset } = useForm<RegisterSchema>({
-    resolver: zodResolver(registerSchema),
+  const { data: schools } = useSchools({
+    onSuccess: (data) => {
+      setValue("school", data[0].name);
+    },
   });
-  const { data: schools } = useSchools();
+
+  const { mutateAsync, isLoading } = useRegisterStudent();
+  const { register, handleSubmit, watch, reset, setValue } =
+    useForm<RegisterSchema>({
+      resolver: zodResolver(registerSchema),
+      defaultValues: {
+        school: "",
+      },
+    });
   // cohools && console.log(schools);
   const school = watch("school");
   const year = watch("year");
+
   const { data: classes } = useClasses({
     variables: { schoolName: school },
-    enabled: !!school,
+    enabled: school ? true : false,
+    onSuccess: (data) => {
+      setValue("year", data[0].name);
+    },
   });
   const { data: courses } = useAvailableCourses({
     variables: { school, classroom: year },
     enabled: !!school && !!year,
+    onSuccess: (data) => {
+      setValue("course", [data[0]?.title]);
+    },
   });
-
   const image = watch("image");
+  const course = watch("course");
+  const s = watch("school");
+  console.log(s);
   let imagePreview: string | null = null;
   const firstImage = image?.[0];
   if (firstImage) {
@@ -52,12 +71,19 @@ function Register() {
   }
   function onSubmit(data: RegisterSchema) {
     // build FormData for uploading image
+    const schoolPk = schools?.find((s) => s.name === data.school)?.pk;
+    const yearPk = classes?.find((s) => s.name === data.year)?.pk;
+    const coursePk = data.course.map(
+      (c) => courses?.find((s) => s.title === c)?.pk
+    );
     const formData = new FormData();
-    formData.append("image", data.image[0]);
+    formData.append("gender", data.gender);
     formData.append("name", data.name);
     formData.append("matric_no", data.matricNo.toString());
-    formData.append("gender", data.gender);
-    formData.append("school", data.school.toString());
+    formData.append("image", data.image[0]);
+    formData.append("school", schoolPk!);
+    formData.append("year", yearPk!);
+    formData.append("courses", coursePk!);
     //submit
     mutateAsync(formData)
       .then(() => {
@@ -67,7 +93,7 @@ function Register() {
           matricNo: "",
           gender: "MALE",
           school: "1",
-          image: null,
+          image: undefined,
         });
       })
       .catch((e) => toast.error(e.message));
@@ -116,7 +142,7 @@ function Register() {
               {...register("school")}
               className="rounded-lg border-gray-200 border py-1 pl-2 w-full"
             >
-              {schools?.map(({ name }, i) => (
+              {schools?.map(({ name }) => (
                 <option value={name} key={name}>
                   {name}
                 </option>
@@ -129,25 +155,26 @@ function Register() {
               {...register("year")}
               className="rounded-lg border-gray-200 border py-1 pl-2 w-full"
             >
-              {classes?.map(({ name }, i) => (
-                <option value={i + 1} key={name}>
+              {classes?.map(({ name }) => (
+                <option value={name} key={name}>
                   {name}
                 </option>
               ))}
             </select>
           </Flex>
+
           <Flex alignItems="start" flexDirection={"col"}>
             <Text>Courses</Text>
-            <select
-              {...register("course")}
-              className="rounded-lg border-gray-200 border py-1 pl-2 w-full"
+            <MultiSelect
+              value={course}
+              onChange={(val) => setValue("course", val)}
             >
-              {courses?.map(({ name }, i) => (
-                <option value={i + 1} key={name}>
-                  {name}
-                </option>
+              {(courses ?? []).map((c) => (
+                <MultiSelectItem value={c.title} key={c.title}>
+                  {c.title}
+                </MultiSelectItem>
               ))}
-            </select>
+            </MultiSelect>
           </Flex>
 
           <Flex alignItems="start" flexDirection={"col"}>

@@ -12,6 +12,7 @@ import useStore from "@/store";
 import {
   useAdminCourses,
   useAdminInstructors,
+  useAdminTotalInfo,
   useAdminTotalStudents,
 } from "@/api/hooks";
 
@@ -22,6 +23,7 @@ function Dashboard() {
       return data.Total_Student;
     },
   });
+  const { data: totalInfo } = useAdminTotalInfo();
   const { data: adminCourses } = useAdminCourses();
   const { data: adminInstructors } = useAdminInstructors();
 
@@ -67,8 +69,7 @@ function Dashboard() {
           <Card decoration="top" decorationColor="blue">
             <Title>MALE</Title>
             <span>
-              <Metric>50</Metric>
-              <Text>PRESENT TODAY</Text>
+              <Metric>{totalInfo?.Total_male_student}</Metric>
             </span>
           </Card>
         </Col>
@@ -76,8 +77,7 @@ function Dashboard() {
           <Card decoration="top" decorationColor="pink">
             <Title>FEMALE</Title>
             <span>
-              <Metric>50</Metric>
-              <Text>PRESENT TODAY</Text>
+              <Metric>{totalInfo?.Total_female_student}</Metric>
             </span>
           </Card>
         </Col>

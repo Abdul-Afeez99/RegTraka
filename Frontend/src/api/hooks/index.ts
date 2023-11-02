@@ -16,6 +16,10 @@ import {
   getInstructorSchoolClasses,
   createInstructorCourse,
   getAttendance,
+  startAttendance,
+  stopAttendance,
+  getStudentList,
+  getAdminTotalInfo,
 } from "..";
 
 export const useSignup = createMutation({
@@ -34,6 +38,10 @@ export const useAdminCourses = createQuery({
 export const useAdminTotalStudents = createQuery({
   primaryKey: "adminTotalStudents",
   queryFn: getAdminTotalStudents,
+});
+export const useAdminTotalInfo = createQuery({
+  primaryKey: "admin-total-info",
+  queryFn: getAdminTotalInfo,
 });
 export const useAdminInstructors = createQuery({
   primaryKey: "adminInstructors",
@@ -75,6 +83,14 @@ export const useAvailableCourses = createQuery<
   primaryKey: "classes",
   queryFn: ({ queryKey: [_key, variables] }) => getAvailableCourses(variables),
 });
+export const useGetStudentList = createQuery<
+  Awaited<ReturnType<typeof getStudentList>>,
+  { classroom: string },
+  Error
+>({
+  primaryKey: "get-student-list",
+  queryFn: ({ queryKey: [_key, variables] }) => getStudentList(variables),
+});
 // INSTRUCTOR ENDPOINTS
 
 export const useInstructorCourses = createQuery({
@@ -99,4 +115,10 @@ export const useInstructorSClasses = createQuery({
 });
 export const useCreateInstuctorCourse = createMutation({
   mutationFn: createInstructorCourse,
+});
+export const useStartAttendance = createMutation({
+  mutationFn: startAttendance,
+});
+export const useStopAttendance = createMutation({
+  mutationFn: stopAttendance,
 });

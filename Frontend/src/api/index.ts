@@ -108,6 +108,16 @@ export async function getAdminTotalStudents() {
   ejectInterceptor();
   return response.data;
 }
+export async function getAdminTotalInfo() {
+  const ejectInterceptor = tokenInterceptors();
+
+  const response = await api.get<{
+    Total_male_student: number;
+    Total_female_student: number;
+  }>("administrator/total_student_info");
+  ejectInterceptor();
+  return response.data;
+}
 
 export async function getAdminInstructors() {
   const ejectInterceptor = tokenInterceptors();
@@ -149,13 +159,13 @@ export async function getAdminClassrooms() {
   return response.data;
 }
 export async function getSchools() {
-  const response = await api.get<{ id: number; name: "string" }[]>(
+  const response = await api.get<{ pk: number; name: "string" }[]>(
     "get_available_schools"
   );
   return response.data;
 }
 export async function getClasses(schoolName: string) {
-  const response = await api.get<{ name: "string" }[]>(
+  const response = await api.get<{ pk: number; name: "string" }[]>(
     `classes_in_school?school=${schoolName}`
   );
   return response.data;
@@ -164,9 +174,22 @@ export async function getAvailableCourses(data: {
   classroom: string;
   school: string;
 }) {
-  const response = await api.get<{ course: any[] }>(
+  const response = await api.get<{ pk: number; title: string }[]>(
     `available_course?classroom=${data.classroom}&school=${data.school}`
   );
+  return response.data;
+}
+export async function getStudentList(data: {
+  classroom: string;
+  // school: string;
+}) {
+  const ejectInterceptor = tokenInterceptors();
+
+  const response = await api.get<
+    { name: string; gender: string; matric_no: string }[]
+  >(`/administrator/class/student-list?year=${data.classroom}`);
+  ejectInterceptor();
+
   return response.data;
 }
 
@@ -222,6 +245,22 @@ export async function createInstructorCourse(data: {
       year: number;
     }[]
   >("/instructor/create_course", data);
+  ejectInterceptor();
+  return response.data;
+}
+export async function startAttendance({ course }: { course: string }) {
+  const ejectInterceptor = tokenInterceptors();
+  const response = await api.post<{ message: string }>(
+    `/instructor/attendance/start?title=${course}`
+  );
+  ejectInterceptor();
+  return response.data;
+}
+export async function stopAttendance({ course }: { course: string }) {
+  const ejectInterceptor = tokenInterceptors();
+  const response = await api.post<{ message: string }>(
+    `/instructor/attendance/stop?title=${course}`
+  );
   ejectInterceptor();
   return response.data;
 }

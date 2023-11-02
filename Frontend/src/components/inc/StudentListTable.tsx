@@ -1,3 +1,4 @@
+import { useStartAttendance, useStopAttendance } from "@/api/hooks";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import {
   Card,
@@ -10,6 +11,7 @@ import {
   Text,
   Title,
   Badge,
+  Button,
 } from "@tremor/react";
 
 export default function StudentListTable({
@@ -23,10 +25,28 @@ export default function StudentListTable({
   }[];
   course: string;
 }) {
-  console.log({ data });
+  const { mutate: startAttendace, isLoading } = useStartAttendance();
+  const { mutate: stopAttendance, isLoading: isStopAttendanceLoading } =
+    useStopAttendance();
   return (
     <Card>
-      <Title>List of {course} students</Title>
+      <div className="flex justify-between items-center">
+        <Title>List of {course} students</Title>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => startAttendace({ course })}
+            loading={isLoading}
+          >
+            Start Attendance
+          </Button>
+          <Button
+            onClick={() => stopAttendance({ course })}
+            loading={isStopAttendanceLoading}
+          >
+            Stop Attendance
+          </Button>
+        </div>
+      </div>
       <Table className="mt-5">
         <TableHead>
           <TableRow>
