@@ -134,7 +134,7 @@ function AddInstructorForm() {
             });
           })}
         >
-          Add Instructor
+          Add Courses
         </Button>
       </Flex>
     </div>
