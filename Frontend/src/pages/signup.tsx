@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Text, Button, Title, Subtitle } from "@tremor/react";
+import { Flex, Button, Title, Subtitle } from "@tremor/react";
 import SignUpImage from "@/assets/signup.png";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,20 +7,25 @@ import { useForm } from "react-hook-form";
 import { useSignup } from "@/api/hooks";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import ControlledInput from "@/components/base/Input";
 const signUpSchema = z.object({
-  firstName: z.string().min(1, "First name is required").max(50),
+  name: z.string().min(1, "Name is required").max(50),
   email: z.string().min(1, "Email is required").email(),
   password: z
     .string()
     .min(1, "Email is required")
-    // .min(12, "Password must be more than 11 characters")
-    // .max(50),
+    .min(12, "Password must be more than 11 characters")
+    .max(50),
 });
 
 type SignUpSchema = z.infer<typeof signUpSchema>;
 
 function SignUp() {
-  const { register, handleSubmit } = useForm<SignUpSchema>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
   });
   const { mutateAsync, isLoading } = useSignup();
@@ -39,36 +44,37 @@ function SignUp() {
           flexDirection="col"
           className="gap-2 mt-4 [&]>*:w-full "
         >
-          <Flex alignItems="start" flexDirection="col">
-            <Text>First Name</Text>
-            <input
-              type="text"
-              className="rounded-lg border-gray-200 border py-1 pl-2 w-full"
-              {...register("firstName")}
-            />
-          </Flex>
-          <Flex alignItems="start" flexDirection="col">
-            <Text>Email</Text>
-            <input
-              type="email"
-              className="rounded-lg border-gray-200 border py-1 pl-2 w-full"
-              {...register("email")}
-            />
-          </Flex>
-          <Flex alignItems="start" flexDirection="col">
-            <Text>Password</Text>
-            <input
-              type="password"
-              className="rounded-lg border-gray-200 border py-1 pl-2 w-full"
-              {...register("password")}
-            />
-          </Flex>
+          <ControlledInput
+            register={register}
+            name="name"
+            label="Name"
+            placeholder="Enter your Name"
+            errors={errors}
+          />
+          <ControlledInput
+            register={register}
+            name="email"
+            label="Email"
+            placeholder="Enter your Email"
+            errors={errors}
+            type="email"
+          />
+
+          <ControlledInput
+            register={register}
+            name="password"
+            label="Password"
+            placeholder="Enter your Password"
+            errors={errors}
+            type="password"
+          />
+
           <Button
             className="mt-3"
             loading={isLoading}
             onClick={handleSubmit((data) => {
               mutateAsync({
-                name: data.firstName,
+                name: data.name,
                 email: data.email,
                 password: data.password,
               }).then(() => {
