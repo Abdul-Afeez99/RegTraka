@@ -74,6 +74,8 @@ def start_attendance_process():
                             if matric_no[index] not in list_of_student:
                                 list_of_student.append(matric_no[index])
                 
+                cv2.imshow('Attendance Window', img)  # Display the frame
+                cv2.waitKey(FPS_MS)  # Wait for the specified time
                 # Sleep for a short duration to control frame rate                
                 time.sleep(FPS)
         # Release the video capture object when attendance process is stopped        
