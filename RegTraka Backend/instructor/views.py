@@ -89,11 +89,11 @@ def markStudent(course_title, student_list):
     try:
         for student_no in student_list:
             # Check if the student with the given matric_no exists
-            student_obj = Student.objects.filter(matric_no=student_no).first()
+            student_obj = Student.objects.filter(matric_no=student_no.split("\\")[-1]).first()
             if student_obj:
                 course_obj = Courses.objects.get(title=course_title)
                 is_present = True
-                serializer = AttendanceSerializer(data={'student': student_obj, 'course': course_obj, 'is_present': is_present})
+                serializer = AttendanceSerializer(data={'student': student_obj.pk, 'course': course_obj.pk, 'is_present': is_present})
                 if serializer.is_valid():
                     serializer.save()
                 else:
