@@ -20,3 +20,6 @@ db.sqlite3
 
 #ignore images 
 images
+
+#ignore encode file
+EncodeFile.p

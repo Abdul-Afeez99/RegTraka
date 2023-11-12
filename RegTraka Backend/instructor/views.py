@@ -10,6 +10,7 @@ import os, pickle, cv2, face_recognition, time
 import numpy as np
 import threading
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
+from datetime import date
 
 
 list_of_student = []
@@ -87,11 +88,13 @@ def start_attendance_process():
 # Function to mark the attendance
 def markStudent(course_title, student_list):        
     try:
+        current_date = date.today()
         for student_no in student_list:
             # Check if the student with the given matric_no exists
             student_obj = Student.objects.filter(matric_no=student_no.split("\\")[-1]).first()
-            if student_obj:
-                course_obj = Courses.objects.get(title=course_title)
+            course_obj = Courses.objects.get(title=course_title)
+            check_student_attendance = Attendance.objects.filter(date=current_date, student=student_obj, course=course_obj).first()
+            if not check_student_attendance:
                 is_present = True
                 serializer = AttendanceSerializer(data={'student': student_obj.pk, 'course': course_obj.pk, 'is_present': is_present})
                 if serializer.is_valid():
@@ -99,7 +102,8 @@ def markStudent(course_title, student_list):
                 else:
                     print(f"Error in markStudent - Serializer is not valid: {serializer.errors}")
             else:
-                print(f"Error in markStudent - Student with matric_no {student_no} does not exist.")
+                print(f"Student with matric_no {student_no} has been marked present.")
+                continue
     except Exception as e:
         print(f"Error in markStudent: {e}")
 
